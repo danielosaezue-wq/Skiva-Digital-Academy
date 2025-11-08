@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { User, Mail, Book, Users, Calendar, MessageSquare, Phone, MapPin, BarChart, Clock } from 'lucide-react';
+import { User, Mail, Book, Users, Calendar, MessageSquare, Phone, MapPin, BarChart, Clock, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,8 +42,10 @@ const BookTraining = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '',
-    courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: ''
+    courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: ''
   });
+  
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
   
   const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const weekends = ['Saturday', 'Sunday'];
@@ -75,7 +77,39 @@ const BookTraining = () => {
     return course.basePrice; // Default is 'Online (Group)'
   };
   
-  const calculatedPrice = getPriceForMode(formData.courseInterest, formData.trainingMode);
+  // Calculate original price for the selected course and mode
+  const originalPrice = getPriceForMode(formData.courseInterest, formData.trainingMode);
+  
+  // Calculate discount and final price
+  const discount = isPromoApplied ? originalPrice * 0.3 : 0;
+  const calculatedPrice = originalPrice - discount;
+
+  const handlePromoCodeApply = () => {
+    if (formData.promoCode.trim() === 'sda_101125') {
+      setIsPromoApplied(true);
+      toast({
+        title: "🎉 Promo Code Applied!",
+        description: "30% discount has been applied to your training fee!",
+        className: 'bg-green-100 border-green-400 text-green-700'
+      });
+    } else if (formData.promoCode.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Promo Code",
+        description: "The promo code you entered is not valid.",
+      });
+    }
+  };
+
+  const handlePromoCodeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, promoCode: value }));
+    
+    // Remove discount if promo code is cleared
+    if (!value.trim() && isPromoApplied) {
+      setIsPromoApplied(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,6 +137,9 @@ const BookTraining = () => {
         age_range: formData.ageRange,
         skill_level: formData.skillLevel,
         course_price: `₦${calculatedPrice.toLocaleString()}`,
+        original_price: isPromoApplied ? `₦${originalPrice.toLocaleString()}` : `₦${originalPrice.toLocaleString()}`,
+        discount_applied: isPromoApplied ? '30%' : '0%',
+        promo_code_used: isPromoApplied ? formData.promoCode : 'None',
         additional_message: formData.message || 'No additional message',
         form_type: 'Book Training',
         submission_date: new Date().toLocaleString()
@@ -129,7 +166,8 @@ I would like to book a training:
 💻 *Training Mode:* ${formData.trainingMode}
 ⏰ *Preferred Time:* ${formData.preferredTime}
 📅 *Schedule:* ${formData.preferredSchedule.join(', ') || 'Not specified'}
-💰 *Price:* ₦${calculatedPrice.toLocaleString()}
+💰 *Price:* ₦${calculatedPrice.toLocaleString()}${isPromoApplied ? ` (Original: ₦${originalPrice.toLocaleString()}, 30% OFF!)` : ''}
+${isPromoApplied ? `🎟️ *Promo Code Used:* ${formData.promoCode}` : ''}
 💬 *Message:* ${formData.message || 'No additional message'}
 
 Please contact me with available dates and payment details.`;
@@ -144,7 +182,8 @@ Please contact me with available dates and payment details.`;
         className: 'bg-green-100 border-green-400 text-green-700'
       });
       
-      setFormData({ fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '' });
+      setFormData({ fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '' });
+      setIsPromoApplied(false);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({ variant: "destructive", title: "Submission Error", description: "There was an error. Please try again or contact us directly.", duration: 6000 });
@@ -183,17 +222,41 @@ Please contact me with available dates and payment details.`;
                 <div className="space-y-4">
                   <label className="flex items-center space-x-2 text-gray-700 font-medium"><Users className="h-5 w-5 text-primary" /><span>Training Mode</span></label>
                   <div className="space-y-2">
-                    {['Online (Group)', 'Online (One-on-one)', 'Physical (One-on-one)'].map(mode => (
-                      <label key={mode} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer has-[:checked]:bg-secondary has-[:checked]:border-primary">
-                        <div className="flex items-center space-x-3">
-                          <input type="radio" name="trainingMode" value={mode} checked={formData.trainingMode === mode} onChange={handleInputChange} className="form-radio text-primary focus:ring-primary" />
-                          <span className="text-gray-700 font-medium">{mode}</span>
-                        </div>
-                        <span className="text-primary font-semibold">
-                          {formData.courseInterest && `₦${getPriceForMode(formData.courseInterest, mode).toLocaleString()}`}
-                        </span>
-                      </label>
-                    ))}
+                    {['Online (Group)', 'Online (One-on-one)', 'Physical (One-on-one)'].map(mode => {
+                      const modeOriginalPrice = getPriceForMode(formData.courseInterest, mode);
+                      const modeDiscount = isPromoApplied ? modeOriginalPrice * 0.3 : 0;
+                      const modeFinalPrice = modeOriginalPrice - modeDiscount;
+                      
+                      return (
+                        <label key={mode} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer has-[:checked]:bg-secondary has-[:checked]:border-primary">
+                          <div className="flex items-center space-x-3">
+                            <input 
+                              type="radio" 
+                              name="trainingMode" 
+                              value={mode} 
+                              checked={formData.trainingMode === mode} 
+                              onChange={handleInputChange} 
+                              className="form-radio text-primary focus:ring-primary" 
+                            />
+                            <span className="text-gray-700 font-medium">{mode}</span>
+                          </div>
+                          <div className="text-right">
+                            {formData.courseInterest && (
+                              <>
+                                {isPromoApplied ? (
+                                  <>
+                                    <span className="text-green-600 font-semibold">₦{modeFinalPrice.toLocaleString()}</span>
+                                    <span className="block text-sm text-gray-500 line-through">₦{modeOriginalPrice.toLocaleString()}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-primary font-semibold">₦{modeOriginalPrice.toLocaleString()}</span>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
                 <div><label className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Clock className="h-5 w-5 text-primary" /><span>Preferred Time</span></label><select id="preferredTime" name="preferredTime" value={formData.preferredTime} onChange={handleInputChange} required className="form-control"><option value="" disabled>Select a time</option><option value="Morning">Morning</option><option value="Afternoon">Afternoon</option><option value="Evening">Evening</option></select></div>
@@ -203,7 +266,66 @@ Please contact me with available dates and payment details.`;
                   <div className="mt-4"><p className="text-sm font-medium text-gray-600 mb-2">Weekends</p><div className="flex flex-wrap gap-x-6 gap-y-2">{weekends.map(day => (<div key={day} className="flex items-center space-x-2"><Checkbox id={`schedule-${day.toLowerCase()}`} checked={formData.preferredSchedule.includes(day)} onCheckedChange={() => handleCheckboxChange(day)} /><Label htmlFor={`schedule-${day.toLowerCase()}`}>{day}</Label></div>))}</div></div>
                 </div>
                 <div><label htmlFor="message" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><MessageSquare className="h-5 w-5 text-primary" /><span>Additional Message</span></label><Textarea id="message" name="message" value={formData.message} onChange={handleInputChange} placeholder="Any specific questions or requirements?" rows={4} className="long-message" /></div>
-                <div className="text-center"><Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto bg-accent text-accent-foreground hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed">{isSubmitting ? 'Submitting...' : 'Submit & Book Training'}</Button></div>
+                
+                {/* Promo Code Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Tag className="h-5 w-5 text-primary" />
+                    <label htmlFor="promoCode" className="text-gray-700 font-medium">Promo Code (Optional)</label>
+                  </div>
+                  <div className={`p-4 rounded-lg border-2 ${isPromoApplied ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1">
+                        <Input
+                          id="promoCode"
+                          name="promoCode"
+                          type="text"
+                          value={formData.promoCode}
+                          onChange={handlePromoCodeChange}
+                          placeholder="Enter promo code"
+                          className={`h-12 text-center font-medium ${isPromoApplied ? 'border-green-300 bg-white' : 'border-yellow-300'}`}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handlePromoCodeApply}
+                        disabled={!formData.promoCode.trim() || isPromoApplied}
+                        className={`h-12 ${isPromoApplied ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white font-semibold`}
+                      >
+                        {isPromoApplied ? '✓ Applied' : 'Apply Code'}
+                      </Button>
+                    </div>
+                    {isPromoApplied && (
+                      <div className="mt-3 p-3 bg-green-100 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-800 font-semibold">🎉 30% Discount Applied!</span>
+                          <span className="text-green-800 font-bold">
+                            You save: ₦{discount.toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-green-700 text-sm mt-1">
+                          Your training fee has been reduced from ₦{originalPrice.toLocaleString()} to ₦{calculatedPrice.toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                    {!isPromoApplied && formData.promoCode && (
+                      <p className="text-sm text-gray-600 mt-2 text-center">
+                        Enter "sda_101125" to get 30% off your training!
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    disabled={isSubmitting} 
+                    className="w-full md:w-auto bg-accent text-accent-foreground hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Submitting...' : `Book Training - ₦${calculatedPrice.toLocaleString()}`}
+                  </Button>
+                </div>
               </form>
             </motion.div>
           </div>
