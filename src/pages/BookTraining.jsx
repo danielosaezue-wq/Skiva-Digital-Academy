@@ -310,7 +310,7 @@ Please contact me with available dates and payment details.`;
                     )}
                     {!isPromoApplied && formData.promoCode && (
                       <p className="text-sm text-gray-600 mt-2 text-center">
-                        Enter "sda_101125" to get 30% off your training!
+                        Enter your discount code to receive 30% off your training fee!
                       </p>
                     )}
                   </div>
