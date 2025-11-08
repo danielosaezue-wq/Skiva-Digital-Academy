@@ -55,15 +55,29 @@ const BecomeAnInstructor = () => {
     const schedule = formData.getAll('schedule');
     const trainingMode = formData.getAll('trainingMode');
 
+    // Ensure all fields have values, even if empty
     const submissionData = {
-      ...data,
-      expertise: selectedExpertise.join(', '),
-      schedule: schedule.join(', '),
-      trainingMode: trainingMode.join(', '),
+      fullName: data.fullName || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      location: data.location || '',
+      languages: data.languages || '',
+      experience: data.experience || '',
+      hasTaught: data.hasTaught || 'no',
+      teachingExperience: data.teachingExperience || 'Not provided',
+      portfolio_link: data.portfolio_link || 'Not provided',
+      hasLaptop: data.hasLaptop || 'yes',
+      hasInternet: data.hasInternet || 'yes',
+      hoursPerWeek: data.hoursPerWeek || '',
+      whyTeach: data.whyTeach || 'Not provided',
+      expertise: selectedExpertise.join(', ') || 'Not specified',
+      schedule: schedule.join(', ') || 'Not specified',
+      trainingMode: trainingMode.join(', ') || 'Not specified',
       form_type: 'Become an Instructor Application',
       current_date: getCurrentDate()
     };
 
+    // Portfolio link and whyTeach are optional, so no validation needed for them
     if (!submissionData.fullName || !submissionData.email || !submissionData.phone || selectedExpertise.length === 0) {
         toast({
             variant: "destructive",
@@ -75,7 +89,7 @@ const BecomeAnInstructor = () => {
     }
 
     try {
-      // Initialize EmailJS (important step that's often missed)
+      // Initialize EmailJS
       emailjs.init('XO3x8E4Ry_8SzuR8N');
 
       const EMAILJS_SERVICE_ID = 'service_mw1a8qa';
@@ -96,7 +110,7 @@ const BecomeAnInstructor = () => {
       if (result.status === 200) {
         const whatsappMessage = `Hello Skiva Digital Academy 👋
 
-I’ve just submitted my Instructor application. Below is a copy of my details for your review:
+I've just submitted my Instructor application. Below is a copy of my details for your review:
 
 👤 *Name:* ${submissionData.fullName}
 📧 *Email:* ${submissionData.email}
@@ -111,8 +125,10 @@ I’ve just submitted my Instructor application. Below is a copy of my details f
 ⏰ *Hours/Week:* ${submissionData.hoursPerWeek}
 📅 *Schedule:* ${submissionData.schedule}
 💡 *Training Mode:* ${submissionData.trainingMode}
+${submissionData.portfolio_link && submissionData.portfolio_link !== 'Not provided' ? `🔗 *Portfolio:* ${submissionData.portfolio_link}` : ''}
+${submissionData.whyTeach && submissionData.whyTeach !== 'Not provided' ? `💭 *Teaching Motivation:* ${submissionData.whyTeach}` : ''}
 
-I’ve also consented to the stated terms. Kindly review my application.`;
+I've also consented to the stated terms. Kindly review my application.`;
 
         const whatsappUrl = `https://wa.me/2347025753414?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
@@ -193,20 +209,20 @@ I’ve also consented to the stated terms. Kindly review my application.`;
                 <div className="space-y-4">
                   <h3 className="font-semibold font-heading text-xl text-primary">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="grid gap-2"><Label htmlFor="fullName">Full Name</Label><Input id="fullName" name="fullName" type="text" placeholder="e.g., Ada Lovelace" required /></div>
-                    <div className="grid gap-2"><Label htmlFor="email">Email Address</Label><Input id="email" name="email" type="email" placeholder="you@example.com" required /></div>
+                    <div className="grid gap-2"><Label htmlFor="fullName">Full Name *</Label><Input id="fullName" name="fullName" type="text" placeholder="e.g., Ada Lovelace" required /></div>
+                    <div className="grid gap-2"><Label htmlFor="email">Email Address *</Label><Input id="email" name="email" type="email" placeholder="you@example.com" required /></div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="grid gap-2"><Label htmlFor="phone">Phone Number</Label><Input id="phone" name="phone" type="tel" placeholder="+234..." required /></div>
-                    <div className="grid gap-2"><Label htmlFor="location">Current Location</Label><Input id="location" name="location" type="text" placeholder="City, State, Country" required /></div>
+                    <div className="grid gap-2"><Label htmlFor="phone">Phone Number *</Label><Input id="phone" name="phone" type="tel" placeholder="+234..." required /></div>
+                    <div className="grid gap-2"><Label htmlFor="location">Current Location *</Label><Input id="location" name="location" type="text" placeholder="City, State, Country" required /></div>
                   </div>
-                  <div className="grid gap-2"><Label htmlFor="languages">Preferred Language(s)</Label><Input id="languages" name="languages" type="text" placeholder="e.g., English, Yoruba" required /></div>
+                  <div className="grid gap-2"><Label htmlFor="languages">Preferred Language(s) *</Label><Input id="languages" name="languages" type="text" placeholder="e.g., English, Yoruba" required /></div>
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="font-semibold font-heading text-xl text-primary">Professional Background</h3>
                   <div className="grid gap-2">
-                    <Label>Area of Expertise (Select all that apply)</Label>
+                    <Label>Area of Expertise (Select all that apply) *</Label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 border rounded-md">
                       {expertiseAreas.map(area => (
                         <div key={area} className="flex items-center space-x-2">
@@ -217,9 +233,9 @@ I’ve also consented to the stated terms. Kindly review my application.`;
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="grid gap-2"><Label htmlFor="experience">Years of Experience</Label><Input id="experience" name="experience" type="number" min="0" placeholder="e.g., 5" required /></div>
+                    <div className="grid gap-2"><Label htmlFor="experience">Years of Experience *</Label><Input id="experience" name="experience" type="number" min="0" placeholder="e.g., 5" required /></div>
                     <div className="grid gap-2">
-                      <Label>Have You Taught Before?</Label>
+                      <Label>Have You Taught Before? *</Label>
                       <RadioGroup name="hasTaught" defaultValue="no" onValueChange={setHasTaughtBefore} className="flex space-x-4 pt-2">
                         <div className="flex items-center space-x-2"><RadioGroupItem value="yes" id="taught-yes" /><Label htmlFor="taught-yes">Yes</Label></div>
                         <div className="flex items-center space-x-2"><RadioGroupItem value="no" id="taught-no" /><Label htmlFor="taught-no">No</Label></div>
@@ -243,6 +259,7 @@ I’ve also consented to the stated terms. Kindly review my application.`;
                       placeholder="https://yourportfolio.com or Behance/Dribbble link" 
                       className="h-10 px-3" 
                     />
+                    <p className="text-sm text-muted-foreground">Share your portfolio if available, but it's not required to submit your application.</p>
                   </div>
                 </div>
                 
@@ -250,14 +267,14 @@ I’ve also consented to the stated terms. Kindly review my application.`;
                   <h3 className="font-semibold font-heading text-xl text-primary">Technical Setup</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label>Laptop/Computer for Teaching?</Label>
+                      <Label>Laptop/Computer for Teaching? *</Label>
                       <RadioGroup name="hasLaptop" defaultValue="yes" className="flex space-x-4 pt-2">
                         <div className="flex items-center space-x-2"><RadioGroupItem value="yes" id="laptop-yes" /><Label htmlFor="laptop-yes">Yes</Label></div>
                         <div className="flex items-center space-x-2"><RadioGroupItem value="no" id="laptop-no" /><Label htmlFor="laptop-no">No</Label></div>
                       </RadioGroup>
                     </div>
                     <div className="grid gap-2">
-                      <Label>Stable Internet Access?</Label>
+                      <Label>Stable Internet Access? *</Label>
                       <RadioGroup name="hasInternet" defaultValue="yes" className="flex space-x-4 pt-2">
                         <div className="flex items-center space-x-2"><RadioGroupItem value="yes" id="internet-yes" /><Label htmlFor="internet-yes">Yes</Label></div>
                         <div className="flex items-center space-x-2"><RadioGroupItem value="no" id="internet-no" /><Label htmlFor="internet-no">No</Label></div>
@@ -265,7 +282,7 @@ I’ve also consented to the stated terms. Kindly review my application.`;
                     </div>
                   </div>
                   <div className="grid gap-2">
-                    <Label>Preferred Training Mode</Label>
+                    <Label>Preferred Training Mode *</Label>
                     <div className="flex flex-wrap gap-4">
                       <div className="flex items-center space-x-2"><Checkbox id="mode-online" name="trainingMode" value="Online" /><Label htmlFor="mode-online">Online</Label></div>
                       <div className="flex items-center space-x-2"><Checkbox id="mode-onsite" name="trainingMode" value="Onsite" /><Label htmlFor="mode-onsite">Onsite</Label></div>
@@ -275,9 +292,9 @@ I’ve also consented to the stated terms. Kindly review my application.`;
 
                 <div className="space-y-4">
                   <h3 className="font-semibold font-heading text-xl text-primary">Availability & Preferences</h3>
-                  <div className="grid gap-2"><Label htmlFor="hoursPerWeek">Hours Per Week (Dedication)</Label><Input id="hoursPerWeek" name="hoursPerWeek" type="number" min="1" placeholder="e.g., 10" required /></div>
+                  <div className="grid gap-2"><Label htmlFor="hoursPerWeek">Hours Per Week (Dedication) *</Label><Input id="hoursPerWeek" name="hoursPerWeek" type="number" min="1" placeholder="e.g., 10" required /></div>
                   <div className="grid gap-2">
-                    <Label>Preferred Teaching Schedule</Label>
+                    <Label>Preferred Teaching Schedule *</Label>
                     <div>
                       <p className="text-sm font-medium text-gray-700 mb-2">Weekdays</p>
                       <div className="flex flex-wrap gap-4">
@@ -295,12 +312,20 @@ I’ve also consented to the stated terms. Kindly review my application.`;
 
                 <div className="space-y-4">
                   <h3 className="font-semibold font-heading text-xl text-primary">Additional Info</h3>
-                  <div className="grid gap-2"><Label htmlFor="whyTeach">Why do you want to teach at Skiva Digital Academy?</Label><Textarea id="whyTeach" name="whyTeach" placeholder="Share your motivation..." required /></div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="whyTeach">Why do you want to teach at Skiva Digital Academy? (Optional)</Label>
+                    <Textarea 
+                      id="whyTeach" 
+                      name="whyTeach" 
+                      placeholder="Share your motivation, what inspires you to teach, or any other relevant information..." 
+                    />
+                    <p className="text-sm text-muted-foreground">This helps us understand your teaching philosophy and motivation.</p>
+                  </div>
                 </div>
 
                 <div className="items-top flex space-x-2">
                   <Checkbox id="consent" name="consent" required />
-                  <div className="grid gap-1.5 leading-none"><label htmlFor="consent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">I confirm that the information provided is accurate and I agree to Skiva Digital Academy's instructor terms and policies.</label></div>
+                  <div className="grid gap-1.5 leading-none"><label htmlFor="consent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">I confirm that the information provided is accurate and I agree to Skiva Digital Academy's instructor terms and policies. *</label></div>
                 </div>
 
                 <div className="text-center">
