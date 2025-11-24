@@ -67,8 +67,13 @@ const Pricing = () => {
   const additionalServices = [
     {
       name: 'Individual Course',
-      price: '₦25,000 - ₦40,000',
+      price: '₦25,000 - ₦200,000',
       description: 'Single course access without additional benefits'
+    },
+    {
+      name: 'Digital Marketing Course',
+      price: '₦150,000',
+      description: 'Comprehensive digital marketing training with AI integration'
     },
     {
       name: 'Mentorship Only',
@@ -99,6 +104,7 @@ const Pricing = () => {
       <Helmet>
         <title>Pricing & Plans - Skiva Digital Academy</title>
         <meta name="description" content="Choose the perfect learning plan for your digital career journey. Flexible pricing options from starter to premium plans with mentorship and internship opportunities." />
+        <meta name="keywords" content="pricing, courses, digital marketing, cybersecurity, UI/UX design, full stack development, data science, Nigeria, Lagos" />
       </Helmet>
 
       <div className="pt-16">

@@ -2,23 +2,66 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Users, ShieldCheck, BookOpen, UserCheck, Award, Briefcase } from 'lucide-react';
+import { ArrowRight, UserCheck, Award, BookOpen, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
+  // CORRECTED ICONS - matching the text properly
   const highlights = [
-    { icon: <CheckCircle className="h-8 w-8 text-accent" />, text: 'Flexible Training Options', subtext: 'One-on-one, group, or online classes.' },
-    { icon: <Users className="h-8 w-8 text-accent" />, text: 'Career Growth Support', subtext: 'Mentorship & Internship Opportunities.' },
-    { icon: <ShieldCheck className="h-8 w-8 text-accent" />, text: 'Personalized Learning', subtext: 'Custom paths & seasoned instructors.' }
+    { 
+      icon: <UserCheck className="h-8 w-8 text-accent" />, 
+      text: 'Learn from Experts', 
+      subtext: 'Proven industry instructors.' 
+    },
+    { 
+      icon: <Award className="h-8 w-8 text-accent" />, 
+      text: 'Job-Ready Skills', 
+      subtext: 'Fast, practical courses.' 
+    },
+    { 
+      icon: <BookOpen className="h-8 w-8 text-accent" />, 
+      text: 'Flexible Learning', 
+      subtext: 'Group or one-on-one online.' 
+    }
   ];
 
   const featuredCourses = [
-    { title: 'Cybersecurity', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/6b64e76048b390486c8974ebf88237c7.jpg', id: 'cyber-security' },
-    { title: 'AI Fundamentals', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/a12c8af88cf250dfcc61f0ba1f8ba6bb.jpg', id: 'ai-fundamentals' },
-    { title: 'Full Stack Development', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/f24d30959a4c21004a95ca7105fd2f4f.jpg', id: 'full-stack-development' },
-    { title: 'Mobile App Development', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/c65852eb7b9fad86a9af1b95e79c1803.jpg', id: 'mobile-app-development' },
-    { title: 'UI/UX Design', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/945a4ed01b10de4fe6ff5430ef2c7e03.jpg', id: 'ui-ux-design' },
-    { title: 'Data Analysis', image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/9bdfb0c833f6ec52c172b0860c6a72c3.jpg', id: 'data-analysis' },
+    { 
+      title: 'Cybersecurity', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/6b64e76048b390486c8974ebf88237c7.jpg', 
+      id: 'cyber-security',
+      description: 'Learn to protect systems, networks, and programs from digital attacks through hands-on labs and real-world security scenarios.'
+    },
+    { 
+      title: 'Full Stack Development', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/f24d30959a4c21004a95ca7105fd2f4f.jpg', 
+      id: 'full-stack-development',
+      description: 'Master both front-end and back-end development to build complete, scalable web applications from concept to deployment.'
+    },
+    { 
+      title: 'Mobile App Development', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/c65852eb7b9fad86a9af1b95e79c1803.jpg', 
+      id: 'mobile-app-development',
+      description: 'Create cross-platform mobile applications using modern development frameworks.'
+    },
+    { 
+      title: 'UI/UX Design', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/945a4ed01b10de4fe6ff5430ef2c7e03.jpg', 
+      id: 'ui-ux-design',
+      description: 'Create intuitive and beautiful user interfaces and experiences for digital products using industry-standard design principles.'
+    },
+    { 
+      title: 'Data Analysis', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/9bdfb0c833f6ec52c172b0860c6a72c3.jpg', 
+      id: 'data-analysis',
+      description: 'Transform raw data into meaningful insights for business decision making using powerful analytical tools.'
+    },
+    { 
+      title: 'Video Editing', 
+      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/c65852eb7b9fad86a9af1b95e79c1803.jpg', 
+      id: 'video-editing',
+      description: 'Learn professional video editing techniques from cutting to final production with industry-standard software.'
+    },
   ];
 
   const processSteps = [
@@ -30,8 +73,8 @@ const Home = () => {
 
   const whyChooseUs = [
     { title: 'Practical Training', description: 'Hands-on training focused on real-world application.' },
-    { title: 'Seasoned Instructors', description: 'Learn from experts with deep industry experience.' },
-    { title: 'Flexible Learning', description: 'Choose from physical, online, or private sessions.' },
+    { title: 'Verified Instructors', description: 'Learn from experts with deep industry experience.' },
+    { title: 'Flexible Learning', description: 'Pick between group or one-on-one online sessions.' },
     { title: 'Standard Curriculum', description: 'Designed for immediate, impactful application.' },
   ];
 
@@ -80,6 +123,7 @@ const Home = () => {
           </div>
         </section>
 
+        {/* HIGHLIGHTS SECTION WITH CORRECTED ICONS */}
         <section className="py-20 bg-secondary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -128,10 +172,13 @@ const Home = () => {
                     <img loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt={`Preview image for ${course.title} course`} src={course.image} />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold font-heading text-primary mb-4">{course.title}</h3>
-                    <Link to={`/course/${course.id}`}>
-                      <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                        View Course
+                    <h3 className="text-xl font-bold font-heading text-primary mb-3">{course.title}</h3>
+                    <p className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-3">
+                      {course.description}
+                    </p>
+                    <Link to="/book-training" state={{ preSelectedCourse: course.title }}>
+                      <Button variant="outline" className="w-full border-primary text-foreground hover:bg-primary hover:text-primary-foreground">
+                        Book Now
                       </Button>
                     </Link>
                   </div>
@@ -149,6 +196,57 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Why Choose Skiva Section - Moved before Process and Updated */}
+        <section className="py-20 bg-gradient-to-br from-primary/10 to-primary/5 border-y border-primary/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+                Why Choose Skiva Digital Academy?
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                We're committed to providing the best learning experience with proven results
+              </p>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {whyChooseUs.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 text-center hover:shadow-xl transition-shadow duration-300"
+                >
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Award className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold font-heading text-primary mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-center mt-12"
+            >
+              <Link to="/about">
+                <Button size="lg" variant="default" className="rounded-full px-8">
+                  Learn More About Us
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Our Process Section - Moved after Why Choose Skiva */}
         <section className="py-20 bg-secondary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -158,7 +256,7 @@ const Home = () => {
               className="text-center mb-16"
             >
               <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
-                Our Process
+                Our Learning Process
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 A simple, effective path to mastering new skills and advancing your career.
@@ -181,31 +279,6 @@ const Home = () => {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-primary text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Why Choose Skiva?</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center max-w-4xl mx-auto mb-8">
-                {whyChooseUs.map((item, index) => (
-                  <div key={index} className="p-4">
-                    <h3 className="text-xl font-bold text-accent">{item.title}</h3>
-                    <p className="text-gray-200">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-              <Link to="/about">
-                <Button size="lg" variant="accent" className="rounded-full">
-                  Learn More About Us
-                </Button>
-              </Link>
-            </motion.div>
           </div>
         </section>
       </div>

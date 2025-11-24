@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { motion } from 'framer-motion';
-import { User, Mail, Book, Users, Calendar, MessageSquare, Phone, MapPin, BarChart, Clock, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Mail, Book, Users, Calendar, MessageSquare, Phone, MapPin, BarChart, Clock, Tag, Info, X, CheckCircle, ExternalLink, Wrench, Laptop, Target, Eye, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,50 +9,412 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import emailjs from '@emailjs/browser';
+import { useLocation } from 'react-router-dom';
 
+// Enhanced courses data with detailed information
 const coursesData = {
-  'Cyber Security': { basePrice: 150000 },
-  'Full Stack Development': { basePrice: 200000 },
-  'UI/UX Design': { basePrice: 120000 },
-  'Video Editing Basics': { basePrice: 100000 },
-  'Artificial Intelligence': { basePrice: 180000 },
-  'Data Analysis': { basePrice: 130000 },
-  'Data Science': { basePrice: 120000 },
-  'Flyer/Poster/Brochure Design': { basePrice: 90000 },
-  'Search Engine Optimization (SEO)': { basePrice: 110000 },
-  'Book Publishing': { basePrice: 140000 },
-  'Photo Editing / Retouching': { basePrice: 95000 },
-  'Graphic / Brand Identity Design': { basePrice: 90000, customPrices: { 'Online (Group)': 90000, 'Online (One-on-one)': 120000, 'Physical (One-on-one)': 180000 } },
-  'Character Animations': { basePrice: 130000 },
-  'Social Media Marketing': { basePrice: 110000 },
-  'Website Design': { basePrice: 150000 },
-  'Mobile App Development': { basePrice: 180000 },
-  'Python Programming': { basePrice: 140000 },
-  'Internet of Things (Fundamentals)': { basePrice: 160000 },
-  'ICT Fundamentals': { basePrice: 70000 },
-  'Front-End Development': { basePrice: 120000 },
-  'Back-End Development': { basePrice: 120000 },
-  '3D Modelling': { basePrice: 120000 },
+  'Cybersecurity': { 
+    basePrice: 150000,
+    description: 'Learn to protect systems, networks, and programs from digital attacks through hands-on labs and real-world security scenarios.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Advanced',
+    tools: ['Wireshark', 'Kali Linux', 'Metasploit', 'Nessus', 'Burp Suite'],
+    outcomes: [
+      'Cybersecurity fundamentals & threat types',
+      'Network security & firewalls',
+      'Ethical hacking & penetration testing',
+      'Security protocols & encryption',
+      'Incident response & vulnerability assessment',
+      'Integrating AI (AI-driven threat detection, anomaly detection, predictive cybersecurity)'
+    ],
+  },
+  'Full Stack Development': { 
+    basePrice: 200000,
+    description: 'Master both front-end and back-end development to build complete, scalable web applications from concept to deployment.',
+    duration: '2 hrs/session • 24 sessions • 12 weeks',
+    level: 'Beginner to Advanced',
+    tools: ['VS Code', 'Git', 'Node.js', 'React', 'Django/Express', 'MongoDB/MySQL'],
+    outcomes: [
+      'Frontend & backend integration',
+      'Full-stack project workflow',
+      'API consumption & development',
+      'State management & routing',
+      'Deployment & hosting (Netlify, Vercel, Heroku)',
+      'Integrating AI (AI-assisted full-stack coding, auto-generated components, AI-driven testing)'
+    ],
+  },
+  'UI/UX Design': { 
+    basePrice: 120000,
+    description: 'Create intuitive and beautiful user interfaces and experiences for digital products using industry-standard design principles.',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Figma', 'Adobe Photoshop'],
+    outcomes: [
+      'Wireframing and Interactive Prototyping',
+      'User Research Methods and Persona Development',
+      'Design Systems and Component Libraries',
+      'Usability Testing and User Feedback Integration',
+      'Design Thinking Process and Problem Solving',
+      'AI-assisted prototyping, smart design suggestions, automated accessibility checks, AI-powered user testing insights',
+      'Portfolio Development'
+    ],
+  },
+  'Video Editing': { 
+    basePrice: 100000,
+    description: 'Learn professional video editing techniques from cutting to final production with industry-standard software.',
+    duration: '2 hrs/session • 8 sessions • 4 weeks',
+    level: 'Beginner',
+    tools: ['Adobe Premiere Pro', 'Cap Cut'],
+    outcomes: [
+      'Video Fundamentals - Frame rates, resolution, aspect ratios, formats',
+      'Editing Basics - Cutting, trimming, transitions, layering clips',
+      'Color Grading & Correction - Enhancing visual tone, LUTs, color matching',
+      'Storytelling with Video Editing',
+      'Audio & Sound Design - Background music, sound effects, voiceovers',
+      'Exporting & Delivery - Formats for web, social media, and broadcast',
+      'AI-assisted editing, automated video cutting, AI-based color grading, smart transitions, AI-generated captions and subtitles'
+    ],
+  },
+  'Data Analysis': { 
+    basePrice: 130000,
+    description: 'Transform raw data into meaningful insights for business decision making using powerful analytical tools.',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Python (Pandas, NumPy)', 'Excel', 'Google Sheets', 'Tableau', 'Power BI'],
+    outcomes: [
+      'Data collection & cleaning',
+      'Exploratory Data Analysis (EDA)',
+      'Statistical analysis & visualization',
+      'Reporting & dashboards',
+      'Business insights & decision making',
+      'Integrating AI (AI-driven predictive analytics, automated data insights)'
+    ],
+  },
+  'Data Science': { 
+    basePrice: 120000,
+    description: 'Master the complete data science pipeline from collection to insights with real-world datasets.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Intermediate',
+    tools: ['Python', 'R', 'Jupyter Notebook', 'Tableau', 'Scikit-learn', 'TensorFlow', 'SQL'],
+    outcomes: [
+      'Data preprocessing & wrangling',
+      'EDA & visualization',
+      'Statistical modeling & hypothesis testing',
+      'Machine learning algorithms (supervised & unsupervised)',
+      'Model evaluation & deployment',
+      'Big data tools (optional: Spark, Hadoop)',
+      'Integrating AI (AI model building, neural networks, AI-driven data insights)'
+    ],
+  },
+  'Search Engine Optimization (SEO)': { 
+    basePrice: 110000,
+    description: 'Optimize websites to rank higher in search engines and drive organic traffic through proven strategies.',
+    duration: '2 hrs/session • 10 sessions • 5 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Google Analytics', 'Google Search Console', 'SEMrush', 'Ahrefs', 'Moz', 'Screaming Frog'],
+    outcomes: [
+      'SEO fundamentals & ranking factors',
+      'Keyword research & analysis',
+      'On-page SEO (meta tags, headings, URL structure)',
+      'Off-page SEO (link building, outreach)',
+      'Technical SEO (site speed, mobile optimization, schema)',
+      'SEO reporting & analytics',
+      'Integrating AI (AI-powered keyword analysis, content optimization, automated SEO tools)'
+    ],
+  },
+  'Digital Marketing': { 
+    basePrice: 170000,
+    description: 'Digital Marketing teaches learners how to promote products and services effectively across digital channels using strategic content, targeted advertising, analytics, and automation. The course equips learners with hands-on skills in social media marketing, SEO, paid ads, email marketing, content strategy, and campaign optimization — preparing them to manage real-world digital marketing campaigns for businesses and brands.',
+    duration: '2 hrs/session • 20 sessions • 10 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Google Analytics', 'Google Ads', 'Meta Ads Manager', 'Mailchimp', 'SEMrush', 'Ahrefs', 'Canva', 'Hootsuite', 'WordPress'],
+    outcomes: [
+      'Digital marketing fundamentals',
+      'Content marketing strategy',
+      'Social media marketing',
+      'Search engine marketing (SEO & Paid Ads)',
+      'Email marketing & automation',
+      'Conversion rate optimization (CRO)',
+      'Web analytics & performance measurement',
+      'Influencer & affiliate marketing',
+      'Marketing funnels & customer journey',
+      'Integrating AI: AI-powered content creation, predictive analytics, automated campaign optimization, AI-driven audience targeting, smart personalization & segmentation'
+    ],
+  },
+  'Book Publishing': { 
+    basePrice: 140000,
+    description: 'Navigate the complete book publishing process from manuscript to marketplace successfully.',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
+    level: 'Beginner',
+    tools: ['Microsoft Word', 'Adobe InDesign', 'KDP', 'Google Docs', 'Grammarly'],
+    outcomes: [
+      'Manuscript Preparation and Editing',
+      'Professional Formatting and Layout Design',
+      'Cover Design Principles and Creation',
+      'Publishing Platforms Mastery',
+      'Marketing and Distribution Strategies',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+  },
+  'Photo Editing / Retouching': { 
+    basePrice: 95000,
+    description: 'Professional photo editing and retouching techniques for stunning visual results.',
+    duration: '2 hrs/session • 8 sessions • 4 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Adobe Photoshop', 'Adobe Lightroom', 'Capture One', 'Affinity Photo'],
+    outcomes: [
+      'Image adjustments (exposure, contrast, color)',
+      'Retouching (blemishes, skin smoothing, background removal)',
+      'Layers, masks & non-destructive editing',
+      'Compositing & creative effects',
+      'Exporting for web & print',
+      'Integrating AI (AI-assisted image enhancement, auto-retouching, AI filters etc)'
+    ],
+  },
+  'Graphic Design': { 
+    basePrice: 90000,
+    customPrices: { 'Online (Group)': 90000, 'Online (One-on-one)': 120000, 'Physical (One-on-one)': 180000 },
+    description: 'Develop complete brand identities including logos, color schemes, and brand guidelines.',
+    duration: '2 hrs/session • 20 sessions • 10 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Adobe Illustrator', 'Photoshop', 'InDesign', 'Canva'],
+    outcomes: [
+      'Design Principles & Fundamentals',
+      'Color Theory & Typography',
+      'Image Editing & Photo Manipulation',
+      'Branding & Logo Design',
+      'Illustrations & Iconography',
+      'Layout & Publication Design',
+      'Marketing & Promotional Design',
+      'Creative Workflow & File Management',
+      'Exporting for Print & Digital',
+      'Portfolio Development',
+      'AI-assisted logo and asset generation, automated color palette suggestions, AI-driven brand style recommendations, generative design tools'
+    ],
+  },
+  'Character Animations': { 
+    basePrice: 130000,
+    description: 'Bring characters to life through animation principles and digital tools.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Adobe Animate', 'After Effects', 'Blender'],
+    outcomes: [
+      'Animation Principles: Timing, squash & stretch, anticipation, follow-through',
+      'Character Design: Creating appealing and expressive characters',
+      'Storyboarding & Planning: Visual storytelling, scene planning, animatics',
+      '2D & 3D Animation Techniques: Keyframing, rigging, motion paths',
+      'Facial & Body Animation: Expressions, gestures, lip-sync',
+      'Special Effects & Motion Graphics: Particle effects, environmental interaction',
+      'Exporting & Delivery: Formats for web, social media, and film',
+      'Integrating AI: AI-assisted rigging, AI-driven in-betweening, automated lip-sync, AI-enhanced motion capture'
+    ],
+  },
+  'Social Media Marketing': { 
+    basePrice: 110000,
+    description: 'Master social media strategies to grow brands and engage audiences effectively.',
+    duration: '2 hrs/session • 10 sessions • 5 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Meta Business Suite', 'Hootsuite', 'Buffer', 'Canva', 'Sprout Social', 'Google Analytics'],
+    outcomes: [
+      'Social media strategy & planning',
+      'Content creation & scheduling',
+      'Platform management (Facebook, Instagram, LinkedIn, TikTok, Twitter)',
+      'Audience engagement & community building',
+      'Analytics & performance tracking',
+      'Paid advertising & campaign management',
+      'Integrating AI: AI-powered content generation, predictive analytics, automated scheduling, audience targeting, AI-driven campaign optimization'
+    ],
+  },
+  'Website Design': { 
+    basePrice: 150000,
+    description: 'Design and build responsive, user-friendly websites that convert visitors.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Figma', 'Adobe XD', 'Sketch', 'Canva', 'InVision'],
+    outcomes: [
+      'UI/UX principles & design thinking',
+      'Wireframing & prototyping',
+      'Color theory & typography',
+      'Responsive design fundamentals',
+      'Design handoff & collaboration with developers',
+      'Integrating AI (AI design assistants, AI-based prototyping, content generation)'
+    ],
+  },
+  'Mobile App Development': { 
+    basePrice: 180000,
+    description: 'Create cross-platform mobile applications using modern development frameworks.',
+    duration: '2 hrs/session • 20 sessions • 10 weeks',
+    level: 'Intermediate to Advanced',
+    tools: ['Flutter', 'React Native', 'Android Studio', 'Xcode', 'Figma (UI)'],
+    outcomes: [
+      'Mobile UI/UX principles',
+      'Dart / JavaScript basics',
+      'Cross-platform app development (Flutter/React Native)',
+      'State management & navigation',
+      'Backend integration & APIs',
+      'App testing & deployment (Play Store/App Store)',
+      'Integrating AI (AI-assisted app prototyping, AI chatbots, predictive app analytics)'
+    ],
+  },
+  'Python Programming': { 
+    basePrice: 140000,
+    description: 'Learn Python programming from basics to advanced applications and automation.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Advanced',
+    tools: ['VS Code', 'PyCharm', 'Jupyter Notebook', 'Anaconda'],
+    outcomes: [
+      'Python syntax & data types',
+      'Control flow & functions',
+      'Modules & packages',
+      'File handling & exceptions',
+      'Object-Oriented Programming (OOP)',
+      'Basic libraries: NumPy, Pandas, Matplotlib',
+      'Integrating AI (AI libraries, neural networks, AI-powered problem solving)'
+    ],
+  },
+  'Internet of Things (Fundamentals)': { 
+    basePrice: 160000,
+    description: 'Connect physical devices to the internet and create smart IoT solutions.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Arduino', 'Raspberry Pi', 'Sensors', 'Node-RED', 'MQTT'],
+    outcomes: [
+      'Circuit Design and Electronic Principles',
+      'Sensor Integration and Data Collection',
+      'IoT Protocols and Communication Methods',
+      'Remote Control and Monitoring Systems',
+      'Prototype Development and Testing',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+  },
+  'ICT Fundamentals': { 
+    basePrice: 70000,
+    description: 'Build essential computer skills and understand fundamental IT concepts.',
+    duration: '2 hrs/session • 8 sessions • 4 weeks',
+    level: 'Absolute Beginner',
+    tools: ['Microsoft Office', 'Windows OS', 'Internet Tools', 'File Management'],
+    outcomes: [
+      'Computer Literacy and Operating System Navigation',
+      'Office Software Proficiency (Word, Excel, PowerPoint)',
+      'Internet Skills and Online Safety',
+      'File Management and Organization',
+      'Basic Troubleshooting and Maintenance',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+  },
+  'Front-End Development': { 
+    basePrice: 120000,
+    description: 'Create beautiful, interactive user interfaces with modern web technologies.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['VS Code', 'Chrome DevTools', 'Git', 'Node.js'],
+    outcomes: [
+      'HTML5, CSS3, JavaScript fundamentals',
+      'Responsive web design & Flexbox/Grid',
+      'CSS frameworks (Bootstrap, Tailwind)',
+      'JavaScript DOM manipulation & events',
+      'Version control (Git & GitHub)',
+      'Integrating AI (AI code assistants, predictive coding, AI-based testing)'
+    ],
+  },
+  'Back-End Development': { 
+    basePrice: 120000,
+    description: 'Build server-side applications, databases, and APIs that power web applications.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Intermediate',
+    tools: ['Node.js', 'Express', 'Django', 'Flask', 'MySQL', 'PostgreSQL', 'MongoDB'],
+    outcomes: [
+      'Server-side programming & APIs',
+      'Database design & management',
+      'Authentication & authorization',
+      'RESTful APIs & CRUD operations',
+      'Security & deployment basics',
+      'Integrating AI (AI-driven server optimization, predictive analytics, AI-based security monitoring)'
+    ],
+  },
+  '3D Modelling': { 
+    basePrice: 120000,
+    description: 'Create stunning 3D models and assets for games, animations, and visualizations.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Blender', 'Maya', 'Unity'],
+    outcomes: [
+      '3D Modeling Techniques and Topology',
+      'Texturing and Material Creation',
+      'Lighting and Rendering Principles',
+      'Asset Creation and Optimization',
+      'Scene Composition and Presentation',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+  },
+  'CompTIA Network+ (N+)': { 
+    basePrice: 170000,
+    description: 'CompTIA Network+ (N+) is an entry-level IT course that teaches the fundamentals of computer networking, including network concepts, infrastructure, security, and troubleshooting, preparing learners for network administration and IT support roles.',
+    duration: '2 hrs/session • 18 sessions • 9 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Packet Tracer', 'Wireshark', 'VirtualBox / VMware', 'CompTIA CertMaster Labs', 'Windows / Linux OS'],
+    outcomes: [
+      'Networking Concepts (OSI/TCP-IP, protocols, IP addressing)',
+      'Network Infrastructure (LAN, WAN, wireless, routers, switches, cabling)',
+      'Network Operations (Monitoring, documentation, disaster recovery)',
+      'Network Security (Firewalls, VPNs, authentication, threats)',
+      'Troubleshooting & Tools (Diagnostics, Packet Tracer, Wireshark)',
+      'Cloud & Virtualization (Virtual networks, network services)',
+      'Network Policies & Best Practices',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+  },
 };
 
 const allCourses = Object.keys(coursesData);
 
 const BookTraining = () => {
   const { toast } = useToast();
+  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '',
-    courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: ''
+    courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '',
+    otherCourseName: ''
   });
   
   const [isPromoApplied, setIsPromoApplied] = useState(false);
   
-  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const weekends = ['Saturday', 'Sunday'];
+  const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  // Handle pre-selected course from navigation
+  useEffect(() => {
+    if (location.state?.preSelectedCourse) {
+      setFormData(prev => ({
+        ...prev,
+        courseInterest: location.state.preSelectedCourse
+      }));
+    }
+  }, [location.state]);
+
+  const selectedCourse = coursesData[formData.courseInterest];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCourseChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ 
+      ...prev, 
+      courseInterest: value,
+      // Clear other course name when a specific course is selected
+      otherCourseName: value === 'Other' ? prev.otherCourseName : ''
+    }));
+  };
+
+  const handleOtherCourseChange = (e) => {
+    const value = e.target.value;
+    // Basic validation - remove any HTML tags and limit to 150 characters
+    const sanitizedValue = value.replace(/<[^>]*>/g, '').slice(0, 150);
+    setFormData(prev => ({ ...prev, otherCourseName: sanitizedValue }));
   };
 
   const handleCheckboxChange = (day) => {
@@ -65,6 +427,11 @@ const BookTraining = () => {
   };
 
   const getPriceForMode = (courseName, mode) => {
+    // For custom courses, use a default price
+    if (courseName === 'Other' || !coursesData[courseName]) {
+      return 120000; // Default price for custom courses
+    }
+
     const course = coursesData[courseName];
     if (!course) return 0;
 
@@ -73,7 +440,6 @@ const BookTraining = () => {
     }
 
     if (mode === 'Online (One-on-one)') return course.basePrice * 1.4;
-    if (mode === 'Physical (One-on-one)') return course.basePrice * 2;
     return course.basePrice; // Default is 'Online (Group)'
   };
   
@@ -113,14 +479,34 @@ const BookTraining = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.email || !formData.courseInterest) {
+    
+    // Validate form
+    if (!formData.fullName || !formData.email) {
       toast({ variant: "destructive", title: "Missing Information", description: "Please fill in all required fields." });
       return;
     }
+
+    // Validate course selection
+    if (!formData.courseInterest) {
+      toast({ variant: "destructive", title: "Course Required", description: "Please select a course or enter a custom course name." });
+      return;
+    }
+
+    // Validate custom course name if "Other" is selected
+    if (formData.courseInterest === 'Other' && !formData.otherCourseName.trim()) {
+      toast({ variant: "destructive", title: "Custom Course Required", description: "Please enter the name of the course you're interested in." });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const weekdays_selected = formData.preferredSchedule.filter(day => weekdays.includes(day)).join(', ') || 'N/A';
-      const weekends_selected = formData.preferredSchedule.filter(day => weekends.includes(day)).join(', ') || 'N/A';
+      const weekdays_selected = formData.preferredSchedule.filter(day => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)).join(', ') || 'N/A';
+      const weekends_selected = formData.preferredSchedule.filter(day => ['Saturday', 'Sunday'].includes(day)).join(', ') || 'N/A';
+
+      // Determine the final course name (custom name overrides dropdown)
+      const finalCourseName = formData.otherCourseName.trim() && formData.courseInterest === 'Other' 
+        ? formData.otherCourseName 
+        : formData.courseInterest;
 
       // Consistent EmailJS template data matching the template structure
       const submissionData = {
@@ -128,7 +514,9 @@ const BookTraining = () => {
         email: formData.email,
         phone: formData.phone,
         location: formData.location,
-        course_name: formData.courseInterest,
+        course_name: finalCourseName,
+        course_source: formData.otherCourseName.trim() && formData.courseInterest === 'Other' ? 'Custom Entry' : 'Dropdown Selection',
+        custom_course_indicator: formData.otherCourseName.trim() && formData.courseInterest === 'Other',
         training_type: formData.trainingMode,
         sponsor: 'Self', // Default for BookTraining form
         preferred_time: formData.preferredTime,
@@ -137,7 +525,7 @@ const BookTraining = () => {
         age_range: formData.ageRange,
         skill_level: formData.skillLevel,
         course_price: `₦${calculatedPrice.toLocaleString()}`,
-        original_price: isPromoApplied ? `₦${originalPrice.toLocaleString()}` : `₦${originalPrice.toLocaleString()}`,
+        original_price: `₦${originalPrice.toLocaleString()}`,
         discount_applied: isPromoApplied ? '30%' : '0%',
         promo_code_used: isPromoApplied ? formData.promoCode : 'None',
         additional_message: formData.message || 'No additional message',
@@ -156,7 +544,7 @@ const BookTraining = () => {
 
 I would like to book a training:
 
-📚 *Course:* ${formData.courseInterest}
+📚 *Course:* ${finalCourseName}${formData.otherCourseName.trim() && formData.courseInterest === 'Other' ? ' (Custom Request)' : ''}
 👤 *Full Name:* ${formData.fullName}
 📧 *Email:* ${formData.email}
 📱 *Phone:* ${formData.phone}
@@ -182,8 +570,14 @@ Please contact me with available dates and payment details.`;
         className: 'bg-green-100 border-green-400 text-green-700'
       });
       
-      setFormData({ fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '' });
+      // Reset form
+      setFormData({ 
+        fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', 
+        courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '',
+        otherCourseName: '' 
+      });
       setIsPromoApplied(false);
+      setShowCourseModal(false);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({ variant: "destructive", title: "Submission Error", description: "There was an error. Please try again or contact us directly.", duration: 6000 });
@@ -192,37 +586,337 @@ Please contact me with available dates and payment details.`;
     }
   };
 
+  const showOtherCourseField = formData.courseInterest === 'Other';
+
   return (
     <>
       <Helmet>
         <title>Book a Training - Skiva Digital Academy</title>
-        <meta name="description" content="Reserve your spot for a training session at Skiva Digital Academy. Fill out the form to get started on your learning journey." />
-        <meta name="keywords" content="book training, tech courses, digital skills, Nigeria, Skiva Digital Academy" />
+        <meta name="description" content="Register for a training session at Skiva Digital Academy. Fill out the form to get started on your learning journey." />
+        <meta name="keywords" content="book training, tech courses, digital skills, Nigeria, Skiva Digital Academy, digital marketing" />
       </Helmet>
+
+      {/* Course Details Modal */}
+      <AnimatePresence>
+        {showCourseModal && selectedCourse && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowCourseModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="bg-primary text-white p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex-1">
+                    <h2 className="text-3xl font-bold mb-4">{formData.courseInterest}</h2>
+                    <p className="text-white text-lg leading-relaxed opacity-95">{selectedCourse.description}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowCourseModal(false)}
+                    className="text-white hover:bg-white hover:bg-opacity-20 ml-6 flex-shrink-0"
+                  >
+                    <X className="h-6 w-6" />
+                  </Button>
+                </div>
+                
+                {/* Course Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                      <Clock className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white text-sm uppercase tracking-wide opacity-90">Duration</div>
+                      <div className="text-white font-medium text-lg">{selectedCourse.duration}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                      <BarChart className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white text-sm uppercase tracking-wide opacity-90">Skill Level</div>
+                      <div className="text-white font-medium text-lg">{selectedCourse.level}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modal Content */}
+              <div className="p-8 overflow-y-auto max-h-[60vh]">
+                <div className="space-y-8">
+                  {/* Learning Requirements */}
+                  <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                    <h4 className="font-semibold text-gray-800 mb-4 flex items-center text-lg">
+                      <Laptop className="h-5 w-5 mr-3 text-primary" />
+                      Course Learning Requirements
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed">
+                      Any laptop with at least 8GB RAM, a Core i5/i7 processor, 256GB SSD, and stable internet is required. 
+                      Students should also have a notebook for notes, maintain a practical and collaborative learning mindset.
+                    </p>
+                  </div>
+
+                  {/* Tools & Technologies */}
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-6 flex items-center text-lg">
+                      <Wrench className="h-5 w-5 mr-3 text-primary" />
+                      Tools & Technologies You'll Master
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {selectedCourse.tools.map((tool, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-3 bg-gray-100 text-gray-800 text-sm rounded-lg font-medium border border-gray-200"
+                        >
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Learning Outcomes - Updated with perfect alignment */}
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-6 flex items-center text-lg">
+                      <Target className="h-5 w-5 mr-3 text-primary" />
+                      What You'll Learn
+                    </h4>
+                    <div className="space-y-3">
+                      {selectedCourse.outcomes.map((outcome, index) => (
+                        <div 
+                          key={index} 
+                          className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200"
+                        >
+                          <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                          <span className="text-gray-700 font-medium align-middle">{outcome}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-gray-200 bg-white px-8 py-6">
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => setShowCourseModal(false)}
+                    className="bg-primary text-white hover:bg-primary-dark px-8 py-3 text-base font-semibold"
+                  >
+                    Close Preview
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="bg-white text-foreground">
         <section className="py-20 bg-gray-50 pt-32 sm:pt-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-4xl md:text-5xl font-bold text-primary mb-4">Reserve Your Spot Today.</motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="text-lg text-gray-600 max-w-2xl mx-auto">Fill out the form below to book your training. Our team will contact you to confirm the details.</motion.p>
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-4xl md:text-5xl font-bold text-primary mb-4">Register Now</motion.h1>
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="text-lg text-gray-600 max-w-2xl mx-auto">Complete the form to book your training. <br /> We'll confirm and match you with an instructor.</motion.p>
           </div>
         </section>
         <section className="py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="bg-white p-8 md:p-12 rounded-2xl shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              transition={{ duration: 0.8 }} 
+              className="bg-white p-8 md:p-12 rounded-2xl shadow-lg"
+            >
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div><label htmlFor="fullName" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><User className="h-5 w-5 text-primary" /><span>Full Name</span></label><Input id="fullName" name="fullName" type="text" value={formData.fullName} onChange={handleInputChange} placeholder="John Doe" required /></div>
-                  <div><label htmlFor="email" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Mail className="h-5 w-5 text-primary" /><span>Email Address</span></label><Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="you@example.com" required /></div>
-                  <div><label htmlFor="phone" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Phone className="h-5 w-5 text-primary" /><span>WhatsApp Phone Number</span></label><Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="+1234567890" required /></div>
-                  <div><label htmlFor="location" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><MapPin className="h-5 w-5 text-primary" /><span>Present Location (Country/State)</span></label><Input id="location" name="location" type="text" value={formData.location} onChange={handleInputChange} placeholder="Nigeria/Lagos" required /></div>
-                  <div><label htmlFor="ageRange" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Users className="h-5 w-5 text-primary" /><span>Age Range</span></label><select id="ageRange" name="ageRange" value={formData.ageRange} onChange={handleInputChange} required className="form-control"><option value="" disabled>Select your age range</option><option value="12-30">12–30</option><option value="31-49">31–49</option><option value="50+">50+</option></select></div>
-                  <div><label htmlFor="skillLevel" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><BarChart className="h-5 w-5 text-primary" /><span>Skill Level</span></label><select id="skillLevel" name="skillLevel" value={formData.skillLevel} onChange={handleInputChange} required className="form-control"><option value="" disabled>Select your skill level</option><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option></select></div>
+                  <div>
+                    <label htmlFor="fullName" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <User className="h-5 w-5 text-primary" />
+                      <span>Full Name</span>
+                    </label>
+                    <Input 
+                      id="fullName" 
+                      name="fullName" 
+                      type="text" 
+                      value={formData.fullName} 
+                      onChange={handleInputChange} 
+                      placeholder="John Doe" 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <Mail className="h-5 w-5 text-primary" />
+                      <span>Email Address</span>
+                    </label>
+                    <Input 
+                      id="email" 
+                      name="email" 
+                      type="email" 
+                      value={formData.email} 
+                      onChange={handleInputChange} 
+                      placeholder="you@example.com" 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <span>WhatsApp Phone Number</span>
+                    </label>
+                    <Input 
+                      id="phone" 
+                      name="phone" 
+                      type="tel" 
+                      value={formData.phone} 
+                      onChange={handleInputChange} 
+                      placeholder="+1234567890" 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="location" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <span>Present Location (Country/State)</span>
+                    </label>
+                    <Input 
+                      id="location" 
+                      name="location" 
+                      type="text" 
+                      value={formData.location} 
+                      onChange={handleInputChange} 
+                      placeholder="Nigeria/Lagos" 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ageRange" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      <span>Age Range</span>
+                    </label>
+                    <select 
+                      id="ageRange" 
+                      name="ageRange" 
+                      value={formData.ageRange} 
+                      onChange={handleInputChange} 
+                      required 
+                      className="form-control"
+                    >
+                      <option value="" disabled>Select your age range</option>
+                      <option value="12-30">12-30</option>
+                      <option value="31-49">31-49</option>
+                      <option value="50+">50+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="skillLevel" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <BarChart className="h-5 w-5 text-primary" />
+                      <span>Skill Level</span>
+                    </label>
+                    <select 
+                      id="skillLevel" 
+                      name="skillLevel" 
+                      value={formData.skillLevel} 
+                      onChange={handleInputChange} 
+                      required 
+                      className="form-control"
+                    >
+                      <option value="" disabled>Select your skill level</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
                 </div>
-                <div><label htmlFor="courseInterest" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Book className="h-5 w-5 text-primary" /><span>Course of Interest</span></label><select id="courseInterest" name="courseInterest" value={formData.courseInterest} onChange={handleInputChange} required className="form-control"><option value="" disabled>Select a course</option>{allCourses.map(course => <option key={course} value={course}>{course}</option>)}</select></div>
+
+                {/* Course Selection with View Details Link */}
                 <div className="space-y-4">
-                  <label className="flex items-center space-x-2 text-gray-700 font-medium"><Users className="h-5 w-5 text-primary" /><span>Training Mode</span></label>
+                  <div>
+                    <label htmlFor="courseInterest" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                      <Book className="h-5 w-5 text-primary" />
+                      <span>Course of Interest</span>
+                    </label>
+                    <select 
+                      id="courseInterest" 
+                      name="courseInterest" 
+                      value={formData.courseInterest} 
+                      onChange={handleCourseChange} 
+                      required 
+                      className="form-control"
+                    >
+                      <option value="" disabled>Select a course</option>
+                      {allCourses.map(course => (
+                        <option key={course} value={course}>{course}</option>
+                      ))}
+                      <option value="Other">Other (Please specify below)</option>
+                    </select>
+                    
+                    {/* View Course Details Link - With Eye icon */}
+                    {formData.courseInterest && formData.courseInterest !== 'Other' && (
+                      <div className="mt-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setShowCourseModal(true)}
+                          className="flex items-center space-x-2 text-primary hover:text-primary-dark text-sm font-medium transition-colors underline ml-auto"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span>View course details</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Custom Course Input Field */}
+                  {showOtherCourseField && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-2"
+                    >
+                      <label htmlFor="otherCourseName" className="flex items-center space-x-2 text-gray-700 font-medium">
+                        <HelpCircle className="h-4 w-4 text-primary" />
+                        <span>Other Course Name (if not listed)</span>
+                      </label>
+                      <Input
+                        id="otherCourseName"
+                        name="otherCourseName"
+                        type="text"
+                        value={formData.otherCourseName}
+                        onChange={handleOtherCourseChange}
+                        placeholder="Enter the name of the course you're interested in"
+                        maxLength={150}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between items-center text-sm text-gray-500">
+                        <span>Please describe the course you're looking for</span>
+                        <span>{formData.otherCourseName.length}/150</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Training Mode - Removed Physical One-on-one */}
+                <div className="space-y-4">
+                  <label className="flex items-center space-x-2 text-gray-700 font-medium">
+                    <Users className="h-5 w-5 text-primary" />
+                    <span>Training Mode</span>
+                  </label>
                   <div className="space-y-2">
-                    {['Online (Group)', 'Online (One-on-one)', 'Physical (One-on-one)'].map(mode => {
+                    {['Online (Group)', 'Online (One-on-one)'].map(mode => {
                       const modeOriginalPrice = getPriceForMode(formData.courseInterest, mode);
                       const modeDiscount = isPromoApplied ? modeOriginalPrice * 0.3 : 0;
                       const modeFinalPrice = modeOriginalPrice - modeDiscount;
@@ -259,13 +953,64 @@ Please contact me with available dates and payment details.`;
                     })}
                   </div>
                 </div>
-                <div><label className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Clock className="h-5 w-5 text-primary" /><span>Preferred Time</span></label><select id="preferredTime" name="preferredTime" value={formData.preferredTime} onChange={handleInputChange} required className="form-control"><option value="" disabled>Select a time</option><option value="Morning">Morning</option><option value="Afternoon">Afternoon</option><option value="Evening">Evening</option></select></div>
+
                 <div>
-                  <label className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><Calendar className="h-5 w-5 text-primary" /><span>Preferred Schedule</span></label>
-                  <div><p className="text-sm font-medium text-gray-600 mb-2">Weekdays</p><div className="flex flex-wrap gap-x-6 gap-y-2">{weekdays.map(day => (<div key={day} className="flex items-center space-x-2"><Checkbox id={`schedule-${day.toLowerCase()}`} checked={formData.preferredSchedule.includes(day)} onCheckedChange={() => handleCheckboxChange(day)} /><Label htmlFor={`schedule-${day.toLowerCase()}`}>{day}</Label></div>))}</div></div>
-                  <div className="mt-4"><p className="text-sm font-medium text-gray-600 mb-2">Weekends</p><div className="flex flex-wrap gap-x-6 gap-y-2">{weekends.map(day => (<div key={day} className="flex items-center space-x-2"><Checkbox id={`schedule-${day.toLowerCase()}`} checked={formData.preferredSchedule.includes(day)} onCheckedChange={() => handleCheckboxChange(day)} /><Label htmlFor={`schedule-${day.toLowerCase()}`}>{day}</Label></div>))}</div></div>
+                  <label className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <span>Preferred Time</span>
+                  </label>
+                  <select 
+                    id="preferredTime" 
+                    name="preferredTime" 
+                    value={formData.preferredTime} 
+                    onChange={handleInputChange} 
+                    required 
+                    className="form-control"
+                  >
+                    <option value="" disabled>Select a time</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                  </select>
                 </div>
-                <div><label htmlFor="message" className="flex items-center space-x-2 text-gray-700 font-medium mb-2"><MessageSquare className="h-5 w-5 text-primary" /><span>Additional Message</span></label><Textarea id="message" name="message" value={formData.message} onChange={handleInputChange} placeholder="Any specific questions or requirements?" rows={4} className="long-message" /></div>
+
+                {/* Preferred Schedule - Updated Layout */}
+                <div>
+                  <label className="flex items-center space-x-2 text-gray-700 font-medium mb-4">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <span>Preferred Schedule</span>
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {allDays.map(day => (
+                      <div key={day} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <Checkbox 
+                          id={`schedule-${day.toLowerCase()}`} 
+                          checked={formData.preferredSchedule.includes(day)} 
+                          onCheckedChange={() => handleCheckboxChange(day)} 
+                        />
+                        <Label htmlFor={`schedule-${day.toLowerCase()}`} className="text-sm font-medium cursor-pointer">
+                          {day}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="flex items-center space-x-2 text-gray-700 font-medium mb-2">
+                    <MessageSquare className="h-5 w-5 text-primary" />
+                    <span>Additional Message</span>
+                  </label>
+                  <Textarea 
+                    id="message" 
+                    name="message" 
+                    value={formData.message} 
+                    onChange={handleInputChange} 
+                    placeholder="Any specific questions or requirements?" 
+                    rows={4} 
+                    className="long-message" 
+                  />
+                </div>
                 
                 {/* Promo Code Section */}
                 <div className="space-y-4">

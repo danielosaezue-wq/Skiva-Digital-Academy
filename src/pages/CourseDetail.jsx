@@ -6,42 +6,426 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Clock, User, Mail, Phone, Wrench, Users, Briefcase, Monitor, Wifi, BookOpen, Brain, Info, HardDrive } from 'lucide-react';
+import { Clock, User, Mail, Phone, Wrench, Users, Briefcase, Monitor, Wifi, BookOpen, Brain, Info, HardDrive, ChevronDown, ChevronUp, CheckCircle, Target, Laptop, Eye, BarChart } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
+// Updated courses data to match BookTraining structure
 const coursesData = {
-  'cyber-security': { title: 'Cyber Security', description: 'Learn to protect digital assets, prevent cyber threats, and secure networks in our comprehensive Cyber Security course. Ideal for aspiring security analysts.', basePrice: 150000, syllabus: ['Intro to Cyber Security', 'Network Security', 'Ethical Hacking', 'Cryptography'], tools: ['Wireshark', 'Nmap', 'Metasploit'], duration: '10 weeks' },
-  'full-stack-development': { title: 'Full Stack Development', description: 'Become a complete web developer by mastering front-end and back-end technologies, from building responsive UIs to managing databases.', basePrice: 200000, syllabus: ['HTML/CSS/JS', 'React', 'Node.js & Express', 'Databases (SQL & NoSQL)'], tools: ['VS Code', 'Git', 'Postman', 'Docker'], duration: '12 weeks' },
-  'ui-ux-design': { title: 'UI/UX Design', description: 'Master the art of user-centric design. Learn to create intuitive, beautiful, and effective digital products through user research, wireframing, and prototyping.', basePrice: 120000, syllabus: ['Design Principles', 'User Research', 'Wireframing & Prototyping', 'Usability Testing'], tools: ['Figma', 'Adobe XD', 'Sketch'], duration: '6 weeks' },
-  'video-editing-basics': { title: 'Video Editing Basics', description: 'Learn to edit and produce professional-quality videos. This course covers everything from basic cuts to color grading and audio mixing.', basePrice: 100000, syllabus: ['Intro to Editing', 'Color Grading', 'Audio Mixing', 'Exporting for Web'], tools: ['Adobe Premiere Pro', 'DaVinci Resolve'], duration: '6 weeks' },
-  'artificial-intelligence': { title: 'Artificial Intelligence', description: 'Step into the world of Artificial Intelligence. Understand the basics of machine learning, neural networks, and real-world AI applications.', basePrice: 180000, syllabus: ['Intro to AI', 'Machine Learning Concepts', 'Neural Networks', 'AI Ethics'], tools: ['Python', 'TensorFlow', 'Scikit-learn'], duration: '8 weeks' },
-  'data-analysis': { title: 'Data Analysis', description: 'Learn to turn raw data into actionable insights. Master data visualization and business intelligence with industry-standard tools like Power BI and Excel.', basePrice: 130000, syllabus: ['Data Cleaning', 'Data Visualization', 'DAX Functions', 'Building Dashboards'], tools: ['Power BI', 'Microsoft Excel'], duration: '8 weeks' },
-  'search-engine-optimization-seo': { title: 'Search Engine Optimization (SEO)', description: 'Learn how to optimize websites and content to rank higher on search engines, drive organic traffic, and improve online visibility.', basePrice: 110000, syllabus: ['Keyword Research', 'On-Page SEO', 'Off-Page SEO', 'Technical SEO'], tools: ['Google Analytics', 'SEMrush', 'Ahrefs'], duration: '6 weeks' },
-  'book-publishing': { title: 'Book Publishing', description: 'Learn how to edit, design, publish, and market books in print and digital formats for a professional audience reach.', basePrice: 140000, syllabus: ['Manuscript Preparation', 'Cover Design', 'Ebook & Print Formatting', 'Publishing to Amazon KDP'], tools: ['Microsoft Word', 'Kindle Create', 'Canva'], duration: '8 weeks' },
-  'photo-editing-retouching': { title: 'Photo Editing / Retouching', description: 'Master professional photo enhancement and retouching techniques for stunning visuals.', basePrice: 95000, syllabus: ['Intro to Lightroom & Photoshop', 'Color Correction', 'Advanced Retouching', 'Exporting for Different Media'], tools: ['Adobe Lightroom', 'Adobe Photoshop'], duration: '5 weeks' },
-  'graphics-brand-identity-design': { title: 'Graphic / Brand Identity Design', description: 'Master the art of visual storytelling and brand creation. Learn to design stunning graphics, build strong brand identities, and craft visuals that connect emotionally and professionally.', basePrice: 90000, syllabus: ['Visual Communication, Colour Theory & Typography', 'Logos, Mood Boards & Brand Guidelines', 'Print & Digital Design — Flyers, Posters, Social Media Graphics', 'Portfolio Design & Client Pitching'], tools: ['Adobe Photoshop', 'Adobe Illustrator', 'Adobe InDesign'], duration: '8 weeks (2 sessions per week)', customPrices: { 'Online (Group)': 90000, 'Online (One-on-one)': 120000, 'Physical (One-on-one)': 180000 } },
-  'character-animations': { title: 'Character Animations', description: 'Bring characters to life through rigging, keyframing, and movement.', basePrice: 130000, syllabus: ['Animation principles', 'Rigging characters', 'Motion graphics', 'Storytelling in animation'], tools: ['Adobe After Effects', 'Blender', 'Toon Boom', 'Moho'], duration: '8 Weeks' },
-  'social-media-marketing': { title: 'Social Media Marketing', description: 'Master the art of social media to grow brands and communities.', basePrice: 110000, syllabus: ['Social strategy setup', 'Content planning', 'Paid ads & campaigns', 'Analytics & growth'], tools: ['Meta Business Suite', 'Canva', 'Buffer', 'Google Analytics'], duration: '6 Weeks' },
-  'website-design': { title: 'Website Design', description: 'Create modern, user-friendly websites with strong layouts and smooth navigation.', basePrice: 150000, syllabus: ['Web design basics', 'Responsive layouts', 'UI/UX principles', 'Hosting & launch'], tools: ['HTML', 'CSS', 'JavaScript', 'WordPress', 'Figma'], duration: '8 Weeks' },
-  'mobile-app-development': { title: 'Mobile App Development', description: 'Create applications for iOS and Android devices.', basePrice: 180000, syllabus: ['Mobile UI design', 'App development basics', 'Backend integration', 'Deployment to stores'], tools: ['Flutter', 'React Native', 'Android Studio', 'Figma'], duration: '10 Weeks' },
-  'python-programming': { title: 'Python Programming', description: 'Master the versatile and powerful Python programming language.', basePrice: 140000, syllabus: ['Python basics', 'Data handling', 'Functions & modules', 'Simple projects'], tools: ['Python', 'Jupyter Notebook', 'VS Code', 'GitHub'], duration: '8 Weeks' },
-  'internet-of-things-fundamentals': { title: 'Internet of Things (Fundamentals)', description: 'Learn how smart devices connect, communicate, and power industries.', basePrice: 160000, syllabus: ['IoT basics', 'Sensors & devices', 'Connectivity protocols', 'Smart projects'], tools: ['Arduino', 'Raspberry Pi', 'Python', 'MQTT'], duration: '8 Weeks' },
-  'ict-fundamentals': { title: 'ICT Fundamentals', description: 'Master MS Excel, Access, and Word for office productivity.', basePrice: 70000, syllabus: ['Basic computer use', 'Word & Excel', 'Internet & email', 'File management'], tools: ['Microsoft Office', 'Windows OS', 'Google Workspace'], duration: '4 Weeks' },
-  'front-end-development': { title: 'Front-End Development', description: 'Learn how to build beautiful, responsive, and interactive websites. This course covers the essentials of modern web interfaces using HTML, CSS, and JavaScript, helping you create stunning, user-friendly front-end experiences.', basePrice: 120000, syllabus: ['Introduction to Web Development', 'HTML5 & Semantic Structure', 'CSS3 & Responsive Design (Flexbox, Grid)', 'JavaScript Fundamentals', 'DOM Manipulation & Events', 'Version Control (Git & GitHub)', 'Frameworks: React (Basics)', 'Project: Build and Deploy a Portfolio Website'], tools: ['VS Code', 'Google Chrome Developer Tools', 'Git & GitHub', 'Figma', 'Netlify / Vercel'], duration: '8-10 weeks' },
-  'back-end-development': { title: 'Back-End Development', description: 'Master the logic and functionality behind web applications. Learn how to build secure servers, manage databases, and create powerful APIs that drive dynamic apps.', basePrice: 120000, syllabus: ['Introduction to Backend & Client-Server Architecture', 'Node.js Fundamentals', 'Express.js Framework', 'Working with Databases (MongoDB / MySQL)', 'RESTful API Design', 'Authentication & Authorization (JWT)', 'Deployment & Hosting', 'Final Project: Build a REST API with Authentication'], tools: ['VS Code', 'Node.js & npm', 'Postman', 'Git & GitHub', 'MongoDB Atlas / MySQL Workbench', 'Render / Railway'], duration: '10-12 weeks' },
-  '3d-modelling': { title: '3D Modelling', description: 'Explore the world of 3D art and design. Learn how to model, texture, light, and render realistic objects and scenes for games, animation, and visual presentations.', basePrice: 120000, syllabus: ['Introduction to 3D Design Concepts', 'Understanding Meshes, Polygons, and Topology', 'Modelling Techniques (Objects, Characters, Environments)', 'Texturing & Materials', 'Lighting & Rendering', 'Animation Basics', 'Exporting & Presentation of 3D Projects', 'Final Project: Create a Detailed 3D Scene'], tools: ['Blender', 'Autodesk Maya (Optional)', 'Substance Painter', 'Photoshop'], duration: '8-10 weeks' },
-  'data-science': { title: 'Data Science', description: 'Learn to collect, analyze, and visualize data using Python and key analytical tools. Gain hands-on experience turning data into insights for real-world decision-making.', basePrice: 120000, syllabus: ['Introduction to Data Science & Data Ecosystem', 'Python Programming for Data Analysis', 'Data Cleaning and Manipulation (NumPy, Pandas)', 'Data Visualization (Matplotlib, Seaborn, Power BI)', 'Statistics & Probability for Data Science', 'Machine Learning Fundamentals (Scikitlearn)', 'Working with Realworld Datasets', 'Final Project: Analyze and Visualize a Dataset'], tools: ['Python (Anaconda / Jupyter Notebook)', 'Pandas, NumPy, Matplotlib, Seaborn', 'Scikitlearn', 'Power BI / Tableau (for visualization)', 'Git & GitHub'], duration: '10-12 weeks' },
+  'cyber-security': { 
+    title: 'Cybersecurity', 
+    basePrice: 150000,
+    description: 'Learn to protect systems, networks, and programs from digital attacks through hands-on labs and real-world security scenarios.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Advanced',
+    tools: ['Wireshark', 'Kali Linux', 'Metasploit', 'Nessus', 'Burp Suite'],
+    outcomes: [
+      'Cybersecurity fundamentals & threat types',
+      'Network security & firewalls',
+      'Ethical hacking & penetration testing',
+      'Security protocols & encryption',
+      'Incident response & vulnerability assessment',
+      'Integrating AI (AI-driven threat detection, anomaly detection, predictive cybersecurity)'
+    ],
+    syllabus: [
+      {
+        module: 'Introduction to Cyber Security',
+        topics: [
+          'Understanding Cyber Threats and Attack Vectors',
+          'Cyber Security Principles and CIA Triad',
+          'Types of Malware and Cyber Attacks',
+          'Security Policies and Compliance'
+        ]
+      },
+      {
+        module: 'Network Security Fundamentals',
+        topics: [
+          'Network Protocols and Security',
+          'Firewalls and Intrusion Detection Systems',
+          'VPNs and Secure Communication',
+          'Wireless Network Security'
+        ]
+      },
+      {
+        module: 'Ethical Hacking and Penetration Testing',
+        topics: [
+          'Footprinting and Reconnaissance',
+          'Vulnerability Assessment',
+          'Penetration Testing Methodologies',
+          'Social Engineering Techniques'
+        ]
+      },
+      {
+        module: 'Cryptography and Data Protection',
+        topics: [
+          'Encryption Algorithms and Techniques',
+          'Digital Signatures and Certificates',
+          'Public Key Infrastructure (PKI)',
+          'Secure Data Storage and Transmission'
+        ]
+      },
+      {
+        module: 'Integrating Artificial Intelligence (AI)',
+        topics: [
+          'AI in Threat Detection and Analysis',
+          'Machine Learning for Security Analytics',
+          'Automated Security Response Systems',
+          'AI-Powered Vulnerability Management'
+        ]
+      }
+    ]
+  },
+  'full-stack-development': { 
+    title: 'Full Stack Development', 
+    basePrice: 200000,
+    description: 'Master both front-end and back-end development to build complete, scalable web applications from concept to deployment.',
+    duration: '2 hrs/session • 24 sessions • 12 weeks',
+    level: 'Beginner to Advanced',
+    tools: ['VS Code', 'Git', 'Node.js', 'React', 'Django/Express', 'MongoDB/MySQL'],
+    outcomes: [
+      'Frontend & backend integration',
+      'Full-stack project workflow',
+      'API consumption & development',
+      'State management & routing',
+      'Deployment & hosting (Netlify, Vercel, Heroku)',
+      'Integrating AI (AI-assisted full-stack coding, auto-generated components, AI-driven testing)'
+    ],
+    syllabus: [
+      {
+        module: 'Frontend Development Fundamentals',
+        topics: [
+          'HTML5 Semantic Structure and Accessibility',
+          'CSS3 Flexbox, Grid and Responsive Design',
+          'JavaScript ES6+ Features and DOM Manipulation',
+          'Version Control with Git and GitHub'
+        ]
+      },
+      {
+        module: 'React.js and Modern Frontend',
+        topics: [
+          'React Components and JSX Syntax',
+          'State Management with Hooks',
+          'React Router for Navigation',
+          'API Integration and Async Operations'
+        ]
+      },
+      {
+        module: 'Backend Development with Node.js',
+        topics: [
+          'Node.js Runtime and NPM Ecosystem',
+          'Express.js Framework and Middleware',
+          'RESTful API Design and Development',
+          'Authentication and Authorization'
+        ]
+      },
+      {
+        module: 'Database Management',
+        topics: [
+          'SQL Databases (PostgreSQL/MySQL)',
+          'NoSQL Databases (MongoDB)',
+          'Database Design and Normalization',
+          'ORM and Query Optimization'
+        ]
+      },
+      {
+        module: 'Integrating Artificial Intelligence (AI)',
+        topics: [
+          'AI-Powered Features in Web Applications',
+          'Chatbot Integration and Natural Language Processing',
+          'Machine Learning Model Deployment',
+          'Intelligent User Experience Enhancement'
+        ]
+      }
+    ]
+  },
+  'ui-ux-design': { 
+    title: 'UI/UX Design', 
+    basePrice: 120000,
+    description: 'Create intuitive and beautiful user interfaces and experiences for digital products using industry-standard design principles.',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Figma', 'Adobe Photoshop'],
+    outcomes: [
+      'Wireframing and Interactive Prototyping',
+      'User Research Methods and Persona Development',
+      'Design Systems and Component Libraries',
+      'Usability Testing and User Feedback Integration',
+      'Design Thinking Process and Problem Solving',
+      'AI-assisted prototyping, smart design suggestions, automated accessibility checks, AI-powered user testing insights',
+      'Portfolio Development'
+    ],
+    syllabus: [
+      {
+        module: 'Design Principles and Fundamentals',
+        topics: [
+          'User-Centered Design Methodology',
+          'Color Theory and Typography',
+          'Layout and Composition Principles',
+          'Design Systems and Component Libraries'
+        ]
+      },
+      {
+        module: 'User Research and Analysis',
+        topics: [
+          'User Personas and Journey Mapping',
+          'Usability Testing Methods',
+          'Competitive Analysis and Market Research',
+          'Accessibility and Inclusive Design'
+        ]
+      },
+      {
+        module: 'Wireframing and Prototyping',
+        topics: [
+          'Low-Fidelity to High-Fidelity Design',
+          'Interactive Prototyping Techniques',
+          'Design Handoff and Developer Collaboration',
+          'Mobile-First Responsive Design'
+        ]
+      },
+      {
+        module: 'Usability Testing and Iteration',
+        topics: [
+          'User Feedback Collection Methods',
+          'A/B Testing and Data-Driven Design',
+          'Design Iteration and Improvement Cycles',
+          'Stakeholder Presentation and Communication'
+        ]
+      },
+      {
+        module: 'Integrating Artificial Intelligence (AI)',
+        topics: [
+          'AI-Powered Design Tools and Automation',
+          'User Behavior Prediction and Personalization',
+          'Generative AI for Design Inspiration',
+          'Intelligent User Interface Adaptation'
+        ]
+      }
+    ]
+  },
+  'data-science': { 
+    title: 'Data Science', 
+    basePrice: 120000,
+    description: 'Master the complete data science pipeline from collection to insights with real-world datasets.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Intermediate',
+    tools: ['Python', 'R', 'Jupyter Notebook', 'Tableau', 'Scikit-learn', 'TensorFlow', 'SQL'],
+    outcomes: [
+      'Data preprocessing & wrangling',
+      'EDA & visualization',
+      'Statistical modeling & hypothesis testing',
+      'Machine learning algorithms (supervised & unsupervised)',
+      'Model evaluation & deployment',
+      'Big data tools (optional: Spark, Hadoop)',
+      'Integrating AI (AI model building, neural networks, AI-driven data insights)'
+    ],
+    syllabus: [
+      {
+        module: 'Introduction to Data Science',
+        topics: [
+          'Data Science Ecosystem and Workflow',
+          'Python Programming for Data Analysis',
+          'Data Collection and Web Scraping',
+          'Statistical Foundations for Data Science'
+        ]
+      },
+      {
+        module: 'Data Manipulation and Analysis',
+        topics: [
+          'Pandas for Data Wrangling',
+          'NumPy for Numerical Computing',
+          'Data Cleaning and Preprocessing',
+          'Exploratory Data Analysis (EDA)'
+        ]
+      },
+      {
+        module: 'Data Visualization',
+        topics: [
+          'Matplotlib and Seaborn for Plotting',
+          'Interactive Visualization with Plotly',
+          'Dashboard Creation with Power BI/Tableau',
+          'Storytelling with Data'
+        ]
+      },
+      {
+        module: 'Machine Learning Fundamentals',
+        topics: [
+          'Supervised vs Unsupervised Learning',
+          'Regression and Classification Algorithms',
+          'Model Evaluation and Validation',
+          'Feature Engineering and Selection'
+        ]
+      },
+      {
+        module: 'Integrating Artificial Intelligence (AI)',
+        topics: [
+          'Advanced Machine Learning Techniques',
+          'Natural Language Processing (NLP)',
+          'Deep Learning Fundamentals',
+          'AI Model Deployment and Monitoring'
+        ]
+      }
+    ]
+  },
+  'digital-marketing': { 
+    title: 'Digital Marketing', 
+    basePrice: 150000,
+    description: 'Digital Marketing teaches learners how to promote products and services effectively across digital channels using strategic content, targeted advertising, analytics, and automation. The course equips learners with hands-on skills in social media marketing, SEO, paid ads, email marketing, content strategy, and campaign optimization — preparing them to manage real-world digital marketing campaigns for businesses and brands.',
+    duration: '2 hrs/session • 20 sessions • 10 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Google Analytics', 'Google Ads', 'Meta Ads Manager', 'Mailchimp', 'SEMrush', 'Ahrefs', 'Canva', 'Hootsuite', 'WordPress'],
+    outcomes: [
+      'Digital marketing fundamentals',
+      'Content marketing strategy',
+      'Social media marketing',
+      'Search engine marketing (SEO & Paid Ads)',
+      'Email marketing & automation',
+      'Conversion rate optimization (CRO)',
+      'Web analytics & performance measurement',
+      'Influencer & affiliate marketing',
+      'Marketing funnels & customer journey',
+      'Integrating AI: AI-powered content creation, predictive analytics, automated campaign optimization, AI-driven audience targeting, smart personalization & segmentation'
+    ],
+    syllabus: [
+      {
+        module: 'Digital Marketing Fundamentals',
+        topics: [
+          'Introduction to Digital Marketing Landscape',
+          'Understanding Customer Journey and Funnels',
+          'Digital Marketing Strategy Development',
+          'Setting SMART Goals and KPIs'
+        ]
+      },
+      {
+        module: 'Content Marketing & Strategy',
+        topics: [
+          'Content Strategy and Planning',
+          'Blogging and Article Writing',
+          'Video Marketing and Storytelling',
+          'Content Distribution and Promotion'
+        ]
+      },
+      {
+        module: 'Social Media Marketing',
+        topics: [
+          'Platform-Specific Strategies (Facebook, Instagram, LinkedIn, TikTok)',
+          'Community Management and Engagement',
+          'Social Media Advertising',
+          'Influencer Marketing Strategies'
+        ]
+      },
+      {
+        module: 'Search Engine Marketing',
+        topics: [
+          'SEO Fundamentals and On-Page Optimization',
+          'Technical SEO and Site Structure',
+          'Paid Search Advertising (Google Ads)',
+          'Local SEO and Google My Business'
+        ]
+      },
+      {
+        module: 'Email Marketing & Automation',
+        topics: [
+          'Email List Building Strategies',
+          'Email Campaign Design and Copywriting',
+          'Marketing Automation Workflows',
+          'A/B Testing and Optimization'
+        ]
+      },
+      {
+        module: 'Analytics & Performance Measurement',
+        topics: [
+          'Google Analytics Setup and Configuration',
+          'Key Metrics and Performance Tracking',
+          'Conversion Rate Optimization (CRO)',
+          'ROI Calculation and Reporting'
+        ]
+      },
+      {
+        module: 'Integrating Artificial Intelligence (AI)',
+        topics: [
+          'AI-Powered Content Creation and Optimization',
+          'Predictive Analytics for Campaign Planning',
+          'Automated Campaign Management',
+          'AI-Driven Audience Targeting and Personalization'
+        ]
+      }
+    ]
+  },
+  'comptia-network-plus': {
+    title: 'CompTIA Network+ (N+)',
+    basePrice: 170000,
+    description: 'CompTIA Network+ (N+) is an entry-level IT course that teaches the fundamentals of computer networking, including network concepts, infrastructure, security, and troubleshooting, preparing learners for network administration and IT support roles.',
+    duration: '2 hrs/session • 18 sessions • 9 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['Packet Tracer', 'Wireshark', 'VirtualBox / VMware', 'CompTIA CertMaster Labs', 'Windows / Linux OS'],
+    outcomes: [
+      'Networking Concepts (OSI/TCP-IP, protocols, IP addressing)',
+      'Network Infrastructure (LAN, WAN, wireless, routers, switches, cabling)',
+      'Network Operations (Monitoring, documentation, disaster recovery)',
+      'Network Security (Firewalls, VPNs, authentication, threats)',
+      'Troubleshooting & Tools (Diagnostics, Packet Tracer, Wireshark)',
+      'Cloud & Virtualization (Virtual networks, network services)',
+      'Network Policies & Best Practices',
+      'Integrating Artificial Intelligence (AI)'
+    ],
+    syllabus: [
+      {
+        module: 'Networking Fundamentals',
+        topics: [
+          'OSI and TCP/IP Models',
+          'Network Topologies and Types',
+          'IP Addressing and Subnetting',
+          'Network Protocols and Services'
+        ]
+      },
+      {
+        module: 'Network Infrastructure',
+        topics: [
+          'Network Devices and Components',
+          'Cabling and Connectors',
+          'Wireless Networks',
+          'Network Storage and Virtualization'
+        ]
+      },
+      {
+        module: 'Network Operations',
+        topics: [
+          'Network Monitoring and Management',
+          'Documentation and Diagrams',
+          'Disaster Recovery and Business Continuity',
+          'Network Optimization'
+        ]
+      },
+      {
+        module: 'Network Security',
+        topics: [
+          'Security Concepts and Threats',
+          'Network Hardening Techniques',
+          'Firewalls and VPNs',
+          'Access Control and Authentication'
+        ]
+      },
+      {
+        module: 'Network Troubleshooting',
+        topics: [
+          'Troubleshooting Methodology',
+          'Common Network Issues',
+          'Tools and Utilities',
+          'Performance Optimization'
+        ]
+      }
+    ]
+  }
 };
 
 const CourseDetail = () => {
   const { courseId } = useParams();
   const { toast } = useToast();
-  const course = coursesData[courseId] || { title: 'Course Not Found', description: '', syllabus: [], tools: [], duration: '', basePrice: 0 };
-
+  const course = coursesData[courseId] || { title: 'Course Not Found', description: '', syllabus: [], tools: [], duration: '', basePrice: 0, outcomes: [] };
+  const [expandedModules, setExpandedModules] = useState({});
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', sponsor: 'Self', trainingPreference: 'Online (Group)', preferredTime: 'Morning' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [calculatedPrice, setCalculatedPrice] = useState(course.basePrice);
-  const [exchangeRate, setExchangeRate] = useState(1400); // Fallback rate
+  const [exchangeRate, setExchangeRate] = useState(1400);
 
   useEffect(() => {
     const fetchRate = async () => {
@@ -66,12 +450,17 @@ const CourseDetail = () => {
       price = course.basePrice;
       if (formData.trainingPreference === 'Online (One-on-one)') {
         price *= 1.4;
-      } else if (formData.trainingPreference === 'Physical (One-on-one)') {
-        price *= 2;
       }
     }
     setCalculatedPrice(price);
   }, [formData.trainingPreference, course]);
+
+  const toggleModule = (moduleIndex) => {
+    setExpandedModules(prev => ({
+      ...prev,
+      [moduleIndex]: !prev[moduleIndex]
+    }));
+  };
 
   const handleInputChange = e => {
     const { name, value } = e.target;
@@ -204,6 +593,16 @@ Thank you! 🎓`;
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-4xl md:text-5xl font-bold font-heading text-primary mb-4">{course.title}</motion.h1>
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="text-lg text-muted-foreground max-w-3xl">{course.description}</motion.p>
+            <div className="flex flex-wrap gap-6 mt-6 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <span>{course.duration}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <BarChart className="w-4 h-4 text-primary" />
+                <span>{course.level}</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -212,38 +611,78 @@ Thank you! 🎓`;
             <div className="lg:col-span-2">
               <h2 className="text-3xl font-bold font-heading mb-6">Course Details</h2>
               <div className="space-y-8">
+                {/* Learning Outcomes Section - Updated to match BookTraining */}
                 <div>
-                  <h3 className="text-xl font-semibold font-heading mb-3">Syllabus</h3>
-                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                    {course.syllabus.map((item, i) => <li key={i}>{item}</li>)}
-                  </ul>
+                  <h3 className="text-xl font-semibold font-heading mb-6 flex items-center">
+                    <Target className="w-5 h-5 mr-3 text-primary" />
+                    What You'll Learn
+                  </h3>
+                  <div className="space-y-3">
+                    {course.outcomes.map((outcome, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200"
+                      >
+                        <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                        <span className="text-gray-700 font-medium align-middle">{outcome}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Course Syllabus */}
                 <div>
-                  <h3 className="text-xl font-semibold font-heading mb-3 flex items-center"><Wrench className="w-5 h-5 mr-2 text-primary" /> Tools & Software</h3>
+                  <h3 className="text-xl font-semibold font-heading mb-3">Course Syllabus</h3>
+                  <div className="space-y-4">
+                    {course.syllabus.map((moduleItem, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => toggleModule(index)}
+                          className="w-full p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center text-left"
+                        >
+                          <span className="font-semibold text-lg">{moduleItem.module}</span>
+                          {expandedModules[index] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                        </button>
+                        {expandedModules[index] && (
+                          <div className="p-4 bg-white">
+                            <ul className="space-y-2">
+                              {moduleItem.topics.map((topic, topicIndex) => (
+                                <li key={topicIndex} className="flex items-start">
+                                  <span className="text-primary mr-2">•</span>
+                                  <span className="text-muted-foreground">{topic}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tools & Technologies */}
+                <div>
+                  <h3 className="text-xl font-semibold font-heading mb-3 flex items-center"><Wrench className="w-5 h-5 mr-2 text-primary" /> Tools & Technologies</h3>
                   <div className="flex flex-wrap gap-2">
                     {course.tools.map((tool, i) => <span key={i} className="bg-secondary text-secondary-foreground text-sm font-medium px-3 py-1 rounded-full">{tool}</span>)}
                   </div>
                 </div>
-                <div className="flex items-center space-x-8 text-muted-foreground pt-4 border-t">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-5 h-5 text-primary" />
-                    <span>Duration: {course.duration}</span>
-                  </div>
-                </div>
               </div>
-              <div className="mt-12 bg-secondary p-6 rounded-lg">
-                <h3 className="text-xl font-semibold font-heading mb-4">Course Learning Requirements</h3>
-                <ul className="space-y-3 text-muted-foreground text-sm">
-                  <li className="flex items-start"><Monitor className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Laptop/Computer:</b> At least 8GB RAM, Core i5/i7 processor.</span></li>
-                  <li className="flex items-start"><HardDrive className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Storage:</b> 256GB SSD recommended for smooth performance.</span></li>
-                  <li className="flex items-start"><Wifi className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Internet Access:</b> Stable connection (5–10 Mbps recommended).</span></li>
-                  <li className="flex items-start"><BookOpen className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Notebook/Journal:</b> For taking notes and tracking progress.</span></li>
-                  <li className="flex items-start"><Clock className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Time Commitment:</b> Dedicate 5–10 hours weekly for classes/projects.</span></li>
-                  <li className="flex items-start"><Brain className="w-4 h-4 mr-3 mt-1 text-primary" /><span><b>Learning Mindset:</b> Be ready to practice, collaborate, and grow.</span></li>
-                </ul>
+
+              {/* Course Learning Requirements - Updated to match BookTraining */}
+              <div className="mt-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+                <h3 className="text-xl font-semibold font-heading mb-4 flex items-center">
+                  <Laptop className="w-5 h-5 mr-3 text-primary" />
+                  Course Learning Requirements
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  Any laptop with at least 8GB RAM, a Core i5/i7 processor, 256GB SSD, and stable internet is required. 
+                  Students should also have a notebook for notes, maintain a practical and collaborative learning mindset.
+                </p>
               </div>
             </div>
             
+            {/* Enrollment Form */}
             <div className="bg-card p-8 rounded-lg shadow-lg">
               <h2 className="text-2xl font-bold font-heading mb-2 text-center">Enroll Now</h2>
               <div className="text-center mb-6">
@@ -254,8 +693,7 @@ Thank you! 🎓`;
                 <div><Label htmlFor="email" className="flex items-center space-x-2 mb-1"><Mail className="w-4 h-4" /><span>Email</span></Label><Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} required placeholder="you@example.com" /></div>
                 <div><Label htmlFor="phone" className="flex items-center space-x-2 mb-1"><Phone className="w-4 h-4" /><span>WhatsApp Phone Number</span></Label><Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} required placeholder="For class updates" /></div>
                 <div><Label htmlFor="sponsor" className="flex items-center space-x-2 mb-1"><Briefcase className="w-4 h-4" /><span>Sponsor</span></Label><select id="sponsor" name="sponsor" value={formData.sponsor} onChange={handleInputChange} required className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"><option>Self</option><option>Parent / Guardian</option><option>Employer</option><option>Other</option></select></div>
-                <div><Label htmlFor="trainingPreference" className="flex items-center space-x-2 mb-1"><Users className="w-4 h-4" /><span>Training Preference</span></Label><select id="trainingPreference" name="trainingPreference" value={formData.trainingPreference} onChange={handleInputChange} required className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"><option value="Online (Group)">Online (Group)</option><option value="Online (One-on-one)">Online (One-on-one)</option><option value="Physical (One-on-one)">Physical (One-on-one)</option></select></div>
-                {formData.trainingPreference === 'Physical (One-on-one)' && <div className="flex items-start p-3 text-xs text-blue-800 rounded-lg bg-blue-50"><Info className="w-8 h-8 mr-2 text-blue-500" /><span>For physical (1-on-1) training, please note that if your chosen location is outside the instructor's proximity, transportation costs may apply for each session.</span></div>}
+                <div><Label htmlFor="trainingPreference" className="flex items-center space-x-2 mb-1"><Users className="w-4 h-4" /><span>Training Preference</span></Label><select id="trainingPreference" name="trainingPreference" value={formData.trainingPreference} onChange={handleInputChange} required className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"><option value="Online (Group)">Online (Group)</option><option value="Online (One-on-one)">Online (One-on-one)</option></select></div>
                 <div><Label htmlFor="preferredTime" className="flex items-center space-x-2 mb-1"><Clock className="w-4 h-4" /><span>Preferred Time</span></Label><select id="preferredTime" name="preferredTime" value={formData.preferredTime} onChange={handleInputChange} required className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>
                 <Button type="submit" variant="accent" size="lg" className="w-full mt-4" disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit Enrollment'}</Button>
               </form>
