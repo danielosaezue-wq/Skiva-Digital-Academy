@@ -500,47 +500,50 @@ const BookTraining = () => {
 
     setIsSubmitting(true);
     try {
-      const weekdays_selected = formData.preferredSchedule.filter(day => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)).join(', ') || 'N/A';
-      const weekends_selected = formData.preferredSchedule.filter(day => ['Saturday', 'Sunday'].includes(day)).join(', ') || 'N/A';
+      const weekdays_selected = formData.preferredSchedule.filter(day => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)).join(', ') || 'Not specified';
+      const weekends_selected = formData.preferredSchedule.filter(day => ['Saturday', 'Sunday'].includes(day)).join(', ') || 'Not specified';
 
       // Determine the final course name (custom name overrides dropdown)
       const finalCourseName = formData.otherCourseName.trim() && formData.courseInterest === 'Other' 
         ? formData.otherCourseName 
         : formData.courseInterest;
 
-      // Consistent EmailJS template data matching the template structure
+      // ULTRA SIMPLIFIED EmailJS template data - only basic variables
       const submissionData = {
-        full_name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        location: formData.location,
-        course_name: finalCourseName,
-        course_source: formData.otherCourseName.trim() && formData.courseInterest === 'Other' ? 'Custom Entry' : 'Dropdown Selection',
-        custom_course_indicator: formData.otherCourseName.trim() && formData.courseInterest === 'Other',
-        training_type: formData.trainingMode,
-        sponsor: 'Self', // Default for BookTraining form
-        preferred_time: formData.preferredTime,
-        weekdays_selected,
-        weekends_selected,
-        age_range: formData.ageRange,
-        skill_level: formData.skillLevel,
+        full_name: formData.fullName || 'Not provided',
+        email: formData.email || 'Not provided',
+        phone: formData.phone || 'Not provided',
+        location: formData.location || 'Not provided',
+        age_range: formData.ageRange || 'Not specified',
+        skill_level: formData.skillLevel || 'Not specified',
+        course_name: finalCourseName || 'Not specified',
+        training_type: formData.trainingMode || 'Not specified',
+        preferred_time: formData.preferredTime || 'Not specified',
+        weekdays_selected: weekdays_selected,
+        weekends_selected: weekends_selected,
         course_price: `₦${calculatedPrice.toLocaleString()}`,
         original_price: `₦${originalPrice.toLocaleString()}`,
         discount_applied: isPromoApplied ? '30%' : '0%',
         promo_code_used: isPromoApplied ? formData.promoCode : 'None',
-        additional_message: formData.message || 'No additional message',
+        additional_message: formData.message || 'No additional message provided',
         form_type: 'Book Training',
         submission_date: new Date().toLocaleString()
       };
 
+      console.log('EmailJS Submission Data:', submissionData);
+
       const EMAILJS_SERVICE_ID = 'service_mw1a8qa';
-      const EMAILJS_TEMPLATE_ID = 'template_cxtz3cs'; // Same template as CourseDetail
+      const EMAILJS_TEMPLATE_ID = 'template_cxtz3cs';
       const EMAILJS_PUBLIC_KEY = 'XO3x8E4Ry_8SzuR8N';
       
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, submissionData, EMAILJS_PUBLIC_KEY);
+      // Send email first
+      const emailResult = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, submissionData, EMAILJS_PUBLIC_KEY);
       
-      // Consistent WhatsApp message format
-      const whatsappMessage = `Hello Skiva Digital Academy! 👋
+      console.log('EmailJS result:', emailResult);
+      
+      if (emailResult.status === 200) {
+        // WhatsApp message
+        const whatsappMessage = `Hello Skiva Digital Academy! 👋
 
 I would like to book a training:
 
@@ -560,27 +563,46 @@ ${isPromoApplied ? `🎟️ *Promo Code Used:* ${formData.promoCode}` : ''}
 
 Please contact me with available dates and payment details.`;
 
-      const whatsappUrl = `https://wa.me/2347025753414?text=${encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappUrl, '_blank');
-      
-      toast({ 
-        title: "Booking Submitted Successfully! 👍", 
-        description: "We've received your request and will contact you within 24 hours.",
-        duration: 8000,
-        className: 'bg-green-100 border-green-400 text-green-700'
-      });
-      
-      // Reset form
-      setFormData({ 
-        fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', 
-        courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '',
-        otherCourseName: '' 
-      });
-      setIsPromoApplied(false);
-      setShowCourseModal(false);
+        const whatsappUrl = `https://wa.me/2347025753414?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(whatsappUrl, '_blank');
+
+        toast({ 
+          title: "Booking Submitted Successfully! 👍", 
+          description: "We've received your request and will contact you within 24 hours.",
+          duration: 8000,
+          className: 'bg-green-100 border-green-400 text-green-700'
+        });
+
+        // Reset form
+        setFormData({ 
+          fullName: '', email: '', phone: '', location: '', ageRange: '', skillLevel: '', 
+          courseInterest: '', trainingMode: 'Online (Group)', preferredTime: '', preferredSchedule: [], message: '', promoCode: '',
+          otherCourseName: '' 
+        });
+        setIsPromoApplied(false);
+        setShowCourseModal(false);
+      } else {
+        throw new Error(`EmailJS returned status: ${emailResult.status}`);
+      }
+
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast({ variant: "destructive", title: "Submission Error", description: "There was an error. Please try again or contact us directly.", duration: 6000 });
+      
+      // More specific error messages
+      let errorMessage = "Something went wrong. Please try again or contact us directly.";
+      
+      if (error.text) {
+        errorMessage = `Email service error: ${error.text}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Submission Error", 
+        description: errorMessage, 
+        duration: 6000 
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -813,7 +835,7 @@ Please contact me with available dates and payment details.`;
                       value={formData.ageRange} 
                       onChange={handleInputChange} 
                       required 
-                      className="form-control"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="" disabled>Select your age range</option>
                       <option value="12-30">12-30</option>
@@ -832,7 +854,7 @@ Please contact me with available dates and payment details.`;
                       value={formData.skillLevel} 
                       onChange={handleInputChange} 
                       required 
-                      className="form-control"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="" disabled>Select your skill level</option>
                       <option value="Beginner">Beginner</option>
@@ -855,7 +877,7 @@ Please contact me with available dates and payment details.`;
                       value={formData.courseInterest} 
                       onChange={handleCourseChange} 
                       required 
-                      className="form-control"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="" disabled>Select a course</option>
                       {allCourses.map(course => (
@@ -930,7 +952,7 @@ Please contact me with available dates and payment details.`;
                               value={mode} 
                               checked={formData.trainingMode === mode} 
                               onChange={handleInputChange} 
-                              className="form-radio text-primary focus:ring-primary" 
+                              className="text-primary focus:ring-primary" 
                             />
                             <span className="text-gray-700 font-medium">{mode}</span>
                           </div>
@@ -965,7 +987,7 @@ Please contact me with available dates and payment details.`;
                     value={formData.preferredTime} 
                     onChange={handleInputChange} 
                     required 
-                    className="form-control"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="" disabled>Select a time</option>
                     <option value="Morning">Morning</option>
@@ -1008,7 +1030,7 @@ Please contact me with available dates and payment details.`;
                     onChange={handleInputChange} 
                     placeholder="Any specific questions or requirements?" 
                     rows={4} 
-                    className="long-message" 
+                    className="w-full"
                   />
                 </div>
                 
