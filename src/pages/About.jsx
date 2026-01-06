@@ -29,11 +29,11 @@ const AnimatedCounter = ({ to }) => {
 };
 
 const About = () => {
-  const logoUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/49e60bbd8ca690e162188560bc90f599.png";
-  const missionImageUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/59cea7f4d6819472d8227bb6e33a311a.png";
-  const visionImageUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/f9e12120330df18b51a7ee07b7514e4e.png";
-  const certificateUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/a92c7d1f3750977511c7786f2eca395f.jpg";
-  const aboutDisplayImageUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/021963de2982b5ed4f0756ee3323ce71.jpg";
+  const logoUrl = "images/skiva_logo.png";
+    const missionImageUrl = "images/our_mission.png";
+    const visionImageUrl = "images/our_vision.png";
+    const certificateUrl = "images/skiva_certificate.jpg";
+    const aboutDisplayImageUrl = "images/Skiva_about_image.jpg";
 
   const whatWeDo = [
     {

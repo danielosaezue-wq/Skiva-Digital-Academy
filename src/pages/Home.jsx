@@ -28,37 +28,37 @@ const Home = () => {
   const featuredCourses = [
     { 
       title: 'Cybersecurity', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/6b64e76048b390486c8974ebf88237c7.jpg', 
+      image: 'images/Cybersecurity.jpg', 
       id: 'cyber-security',
       description: 'Learn to protect systems, networks, and programs from digital attacks through hands-on labs and real-world security scenarios.'
     },
     { 
       title: 'Full Stack Development', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/f24d30959a4c21004a95ca7105fd2f4f.jpg', 
+      image: 'images/Full_stack_development.jpg', 
       id: 'full-stack-development',
       description: 'Master both front-end and back-end development to build complete, scalable web applications from concept to deployment.'
     },
     { 
       title: 'Mobile App Development', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/c65852eb7b9fad86a9af1b95e79c1803.jpg', 
+      image: 'images/mobile_app_development.jpg', 
       id: 'mobile-app-development',
       description: 'Create cross-platform mobile applications using modern development frameworks.'
     },
     { 
       title: 'UI/UX Design', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/945a4ed01b10de4fe6ff5430ef2c7e03.jpg', 
+      image: 'images/ui_ux.jpg', 
       id: 'ui-ux-design',
       description: 'Create intuitive and beautiful user interfaces and experiences for digital products using industry-standard design principles.'
     },
     { 
       title: 'Data Analysis', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/9bdfb0c833f6ec52c172b0860c6a72c3.jpg', 
+      image: 'images/Data_Analysis.jpg', 
       id: 'data-analysis',
       description: 'Transform raw data into meaningful insights for business decision making using powerful analytical tools.'
     },
     { 
       title: 'Video Editing', 
-      image: 'https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/c65852eb7b9fad86a9af1b95e79c1803.jpg', 
+      image: 'images/video_editing.png', 
       id: 'video-editing',
       description: 'Learn professional video editing techniques from cutting to final production with industry-standard software.'
     },

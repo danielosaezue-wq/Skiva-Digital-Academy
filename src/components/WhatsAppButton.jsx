@@ -3,9 +3,13 @@ import { motion } from 'framer-motion';
 
 const WhatsAppButton = () => {
   const phoneNumber = '2347025753414';
-  const message = "Hello Skiva Digital Academy 👋, I'd love to know more about your programs and how to get started.";
+  const message =
+    "Hello Skiva Digital Academy 👋, I'd love to know more about your programs and how to get started.";
+
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-  const iconUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/8773120a59e3b2763e95d489299c0cee.png";
+
+  // ✅ FIXED: local public asset
+  const iconUrl = "/whatsapp.png";
 
   return (
     <motion.a
@@ -21,7 +25,11 @@ const WhatsAppButton = () => {
       aria-label="Chat on WhatsApp"
     >
       <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping group-hover:animate-none"></div>
-      <img src={iconUrl} alt="WhatsApp Icon" className="w-full h-full object-cover" />
+      <img
+        src={iconUrl}
+        alt="WhatsApp Icon"
+        className="w-9 h-9 object-contain"
+      />
     </motion.a>
   );
 };

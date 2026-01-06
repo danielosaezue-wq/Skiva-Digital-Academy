@@ -414,6 +414,98 @@ const coursesData = {
         ]
       }
     ]
+  },
+  'website-design': { 
+    title: 'Website Design', 
+    basePrice: 150000,
+    description: 'This course teaches how to create, customize, and manage professional websites using ready-made themes and drag-and-drop tools—designing and building responsive, user-friendly websites that convert visitors, without coding or designing from scratch.',
+    duration: '2 hrs/session • 16 sessions • 8 weeks',
+    level: 'Beginner to Intermediate',
+    tools: ['WordPress', 'Elementor', 'Wix / Squarespace', 'Canva', 'cPanel', 'Domain & Hosting Platforms'],
+    outcomes: [
+      'Website Basics & Builders Overview',
+      'Domain, Hosting & Website Setup',
+      'Theme Selection & Customization',
+      'Drag-and-Drop Page Building',
+      'Content Management & Media Upload',
+      'Basic SEO, Security & Maintenance',
+      'Website Publishing & Client Handover',
+      'Integrating AI for Website Content, Layout & SEO'
+    ],
+    syllabus: [
+      {
+        module: 'Website Basics & Builders Overview',
+        topics: [
+          'Introduction to Website Builders',
+          'Comparing WordPress, Wix, Squarespace',
+          'Understanding Responsive Design',
+          'Website Planning and Structure'
+        ]
+      },
+      {
+        module: 'Domain, Hosting & Website Setup',
+        topics: [
+          'Choosing and Registering a Domain Name',
+          'Selecting Web Hosting Services',
+          'cPanel Basics and Control Panel Navigation',
+          'Installing WordPress and Other Platforms'
+        ]
+      },
+      {
+        module: 'Theme Selection & Customization',
+        topics: [
+          'Choosing the Right Theme/Template',
+          'Theme Installation and Activation',
+          'Customizing Colors, Fonts, and Layouts',
+          'Creating Custom Menus and Navigation'
+        ]
+      },
+      {
+        module: 'Drag-and-Drop Page Building',
+        topics: [
+          'Introduction to Elementor Page Builder',
+          'Building Pages with Drag-and-Drop Interface',
+          'Adding and Customizing Widgets/Modules',
+          'Creating Responsive Page Layouts'
+        ]
+      },
+      {
+        module: 'Content Management & Media Upload',
+        topics: [
+          'Managing Pages and Posts',
+          'Uploading and Optimizing Images',
+          'Adding Videos and Audio Content',
+          'Creating Contact Forms and Galleries'
+        ]
+      },
+      {
+        module: 'Basic SEO, Security & Maintenance',
+        topics: [
+          'SEO Basics for Website Builders',
+          'Installing Security Plugins',
+          'Website Backup and Recovery',
+          'Performance Optimization'
+        ]
+      },
+      {
+        module: 'Website Publishing & Client Handover',
+        topics: [
+          'Final Testing and Quality Assurance',
+          'Going Live and Publishing Your Site',
+          'Client Training and Documentation',
+          'Ongoing Maintenance Planning'
+        ]
+      },
+      {
+        module: 'Integrating AI for Website Content, Layout & SEO',
+        topics: [
+          'AI-Powered Content Generation',
+          'Automated Layout Suggestions',
+          'AI-Driven SEO Optimization',
+          'Smart Website Analytics'
+        ]
+      }
+    ]
   }
 };
 

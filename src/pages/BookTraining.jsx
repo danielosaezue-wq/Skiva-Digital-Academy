@@ -109,9 +109,9 @@ const coursesData = {
   'Search Engine Optimization (SEO)': { 
     basePrice: 110000,
     description: 'Optimize websites to rank higher in search engines and drive organic traffic through proven strategies.',
-    duration: '2 hrs/session • 10 sessions • 5 weeks',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
     level: 'Beginner to Intermediate',
-    tools: ['Google Analytics', 'Google Search Console', 'SEMrush', 'Ahrefs', 'Moz', 'Screaming Frog'],
+    tools: ['Google Analytics', 'Google Search Console', 'Ubersuggest', 'Google Keyword Planner', 'Screaming Frog'],
     outcomes: [
       'SEO fundamentals & ranking factors',
       'Keyword research & analysis',
@@ -127,7 +127,7 @@ const coursesData = {
     description: 'Digital Marketing teaches learners how to promote products and services effectively across digital channels using strategic content, targeted advertising, analytics, and automation. The course equips learners with hands-on skills in social media marketing, SEO, paid ads, email marketing, content strategy, and campaign optimization — preparing them to manage real-world digital marketing campaigns for businesses and brands.',
     duration: '2 hrs/session • 20 sessions • 10 weeks',
     level: 'Beginner to Intermediate',
-    tools: ['Google Analytics', 'Google Ads', 'Meta Ads Manager', 'Mailchimp', 'SEMrush', 'Ahrefs', 'Canva', 'Hootsuite', 'WordPress'],
+    tools: ['Google Analytics', 'Google Ads', 'Meta Ads Manager (Facebook & Instagram)', 'TikTok Ads Manager', 'Snapchat Ads Manager', 'Mailchimp', 'Ubersuggest', 'Canva', 'Hootsuite', 'WordPress'],
     outcomes: [
       'Digital marketing fundamentals',
       'Content marketing strategy',
@@ -146,7 +146,7 @@ const coursesData = {
     description: 'Navigate the complete book publishing process from manuscript to marketplace successfully.',
     duration: '2 hrs/session • 12 sessions • 6 weeks',
     level: 'Beginner',
-    tools: ['Microsoft Word', 'Adobe InDesign', 'KDP', 'Google Docs', 'Grammarly'],
+    tools: ['Microsoft Word', 'Adobe InDesign', 'KDP', 'Google Docs', 'Photoshop', 'Grammarly'],
     outcomes: [
       'Manuscript Preparation and Editing',
       'Professional Formatting and Layout Design',
@@ -212,9 +212,9 @@ const coursesData = {
   'Social Media Marketing': { 
     basePrice: 110000,
     description: 'Master social media strategies to grow brands and engage audiences effectively.',
-    duration: '2 hrs/session • 10 sessions • 5 weeks',
+    duration: '2 hrs/session • 12 sessions • 6 weeks',
     level: 'Beginner to Intermediate',
-    tools: ['Meta Business Suite', 'Hootsuite', 'Buffer', 'Canva', 'Sprout Social', 'Google Analytics'],
+    tools: ['Meta Business Suite', 'Hootsuite', 'Buffer', 'Canva', 'Zapier', 'TikTok Ads Manager', 'Snapchat Ads Manager'],
     outcomes: [
       'Social media strategy & planning',
       'Content creation & scheduling',
@@ -227,17 +227,19 @@ const coursesData = {
   },
   'Website Design': { 
     basePrice: 150000,
-    description: 'Design and build responsive, user-friendly websites that convert visitors.',
+    description: 'This course teaches how to create, customize, and manage professional websites using ready-made themes and drag-and-drop tools—designing and building responsive, user-friendly websites that convert visitors, without coding or designing from scratch.',
     duration: '2 hrs/session • 16 sessions • 8 weeks',
     level: 'Beginner to Intermediate',
-    tools: ['Figma', 'Adobe XD', 'Sketch', 'Canva', 'InVision'],
+    tools: ['WordPress', 'Elementor', 'Wix / Squarespace', 'Canva', 'cPanel', 'Domain & Hosting Platforms'],
     outcomes: [
-      'UI/UX principles & design thinking',
-      'Wireframing & prototyping',
-      'Color theory & typography',
-      'Responsive design fundamentals',
-      'Design handoff & collaboration with developers',
-      'Integrating AI (AI design assistants, AI-based prototyping, content generation)'
+      'Website Basics & Builders Overview',
+      'Domain, Hosting & Website Setup',
+      'Theme Selection & Customization',
+      'Drag-and-Drop Page Building',
+      'Content Management & Media Upload',
+      'Basic SEO, Security & Maintenance',
+      'Website Publishing & Client Handover',
+      'Integrating AI for Website Content, Layout & SEO'
     ],
   },
   'Mobile App Development': { 
@@ -394,6 +396,7 @@ const BookTraining = () => {
   }, [location.state]);
 
   const selectedCourse = coursesData[formData.courseInterest];
+  const isCustomCourse = formData.courseInterest === 'Other';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -406,8 +409,15 @@ const BookTraining = () => {
       ...prev, 
       courseInterest: value,
       // Clear other course name when a specific course is selected
-      otherCourseName: value === 'Other' ? prev.otherCourseName : ''
+      otherCourseName: value === 'Other' ? prev.otherCourseName : '',
+      // Clear promo code when switching to custom course
+      promoCode: value === 'Other' ? '' : prev.promoCode
     }));
+    
+    // Remove discount if switching to custom course
+    if (value === 'Other' && isPromoApplied) {
+      setIsPromoApplied(false);
+    }
   };
 
   const handleOtherCourseChange = (e) => {
@@ -427,10 +437,12 @@ const BookTraining = () => {
   };
 
   const getPriceForMode = (courseName, mode) => {
-    // For custom courses, use a default price
-    if (courseName === 'Other' || !coursesData[courseName]) {
-      return 120000; // Default price for custom courses
+    // For custom courses, return null to indicate no fixed price
+    if (courseName === 'Other') {
+      return null;
     }
+
+    if (!coursesData[courseName]) return 0;
 
     const course = coursesData[courseName];
     if (!course) return 0;
@@ -446,11 +458,24 @@ const BookTraining = () => {
   // Calculate original price for the selected course and mode
   const originalPrice = getPriceForMode(formData.courseInterest, formData.trainingMode);
   
-  // Calculate discount and final price
-  const discount = isPromoApplied ? originalPrice * 0.3 : 0;
-  const calculatedPrice = originalPrice - discount;
+  // Check if it's a custom course (no fixed price)
+  const isCustomCoursePrice = originalPrice === null;
+  
+  // Calculate discount and final price only for non-custom courses
+  const discount = isPromoApplied && !isCustomCoursePrice ? originalPrice * 0.3 : 0;
+  const calculatedPrice = !isCustomCoursePrice ? originalPrice - discount : null;
 
   const handlePromoCodeApply = () => {
+    // Don't apply promo code for custom courses
+    if (isCustomCourse) {
+      toast({
+        variant: "destructive",
+        title: "Promo Code Not Applicable",
+        description: "Promo codes cannot be applied to custom course requests.",
+      });
+      return;
+    }
+    
     if (formData.promoCode.trim() === 'sda_101125') {
       setIsPromoApplied(true);
       toast({
@@ -493,7 +518,7 @@ const BookTraining = () => {
     }
 
     // Validate custom course name if "Other" is selected
-    if (formData.courseInterest === 'Other' && !formData.otherCourseName.trim()) {
+    if (isCustomCourse && !formData.otherCourseName.trim()) {
       toast({ variant: "destructive", title: "Custom Course Required", description: "Please enter the name of the course you're interested in." });
       return;
     }
@@ -504,11 +529,11 @@ const BookTraining = () => {
       const weekends_selected = formData.preferredSchedule.filter(day => ['Saturday', 'Sunday'].includes(day)).join(', ') || 'Not specified';
 
       // Determine the final course name (custom name overrides dropdown)
-      const finalCourseName = formData.otherCourseName.trim() && formData.courseInterest === 'Other' 
+      const finalCourseName = formData.otherCourseName.trim() && isCustomCourse 
         ? formData.otherCourseName 
         : formData.courseInterest;
 
-      // ULTRA SIMPLIFIED EmailJS template data - only basic variables
+      // Prepare submission data
       const submissionData = {
         full_name: formData.fullName || 'Not provided',
         email: formData.email || 'Not provided',
@@ -521,13 +546,14 @@ const BookTraining = () => {
         preferred_time: formData.preferredTime || 'Not specified',
         weekdays_selected: weekdays_selected,
         weekends_selected: weekends_selected,
-        course_price: `₦${calculatedPrice.toLocaleString()}`,
-        original_price: `₦${originalPrice.toLocaleString()}`,
-        discount_applied: isPromoApplied ? '30%' : '0%',
-        promo_code_used: isPromoApplied ? formData.promoCode : 'None',
+        course_price: isCustomCourse ? 'Custom Quote - Contact for Pricing' : `₦${calculatedPrice.toLocaleString()}`,
+        original_price: isCustomCourse ? 'Custom Quote' : `₦${originalPrice.toLocaleString()}`,
+        discount_applied: isCustomCourse ? 'N/A' : (isPromoApplied ? '30%' : '0%'),
+        promo_code_used: isCustomCourse ? 'N/A' : (isPromoApplied ? formData.promoCode : 'None'),
         additional_message: formData.message || 'No additional message provided',
-        form_type: 'Book Training',
-        submission_date: new Date().toLocaleString()
+        form_type: isCustomCourse ? 'Custom Course Request' : 'Book Training',
+        submission_date: new Date().toLocaleString(),
+        is_custom_course: isCustomCourse ? 'Yes' : 'No'
       };
 
       console.log('EmailJS Submission Data:', submissionData);
@@ -543,11 +569,30 @@ const BookTraining = () => {
       
       if (emailResult.status === 200) {
         // WhatsApp message
-        const whatsappMessage = `Hello Skiva Digital Academy! 👋
+        const whatsappMessage = isCustomCourse 
+          ? `Hello Skiva Digital Academy! 👋
+
+I would like to request a custom training:
+
+📚 *Course Request:* ${finalCourseName}
+👤 *Full Name:* ${formData.fullName}
+📧 *Email:* ${formData.email}
+📱 *Phone:* ${formData.phone}
+📍 *Location:* ${formData.location}
+👥 *Age Range:* ${formData.ageRange}
+📊 *Skill Level:* ${formData.skillLevel}
+💻 *Training Mode:* ${formData.trainingMode}
+⏰ *Preferred Time:* ${formData.preferredTime}
+📅 *Schedule:* ${formData.preferredSchedule.join(', ') || 'Not specified'}
+💰 *Price:* Custom Quote Required
+💬 *Message:* ${formData.message || 'No additional message'}
+
+Please contact me with more information and pricing details.`
+          : `Hello Skiva Digital Academy! 👋
 
 I would like to book a training:
 
-📚 *Course:* ${finalCourseName}${formData.otherCourseName.trim() && formData.courseInterest === 'Other' ? ' (Custom Request)' : ''}
+📚 *Course:* ${finalCourseName}
 👤 *Full Name:* ${formData.fullName}
 📧 *Email:* ${formData.email}
 📱 *Phone:* ${formData.phone}
@@ -567,8 +612,10 @@ Please contact me with available dates and payment details.`;
         window.open(whatsappUrl, '_blank');
 
         toast({ 
-          title: "Booking Submitted Successfully! 👍", 
-          description: "We've received your request and will contact you within 24 hours.",
+          title: isCustomCourse ? "Custom Course Request Submitted! 👍" : "Booking Submitted Successfully! 👍", 
+          description: isCustomCourse 
+            ? "We've received your custom course request and will contact you with pricing details within 24 hours."
+            : "We've received your request and will contact you within 24 hours.",
           duration: 8000,
           className: 'bg-green-100 border-green-400 text-green-700'
         });
@@ -608,7 +655,7 @@ Please contact me with available dates and payment details.`;
     }
   };
 
-  const showOtherCourseField = formData.courseInterest === 'Other';
+  const showOtherCourseField = isCustomCourse;
 
   return (
     <>
@@ -618,9 +665,9 @@ Please contact me with available dates and payment details.`;
         <meta name="keywords" content="book training, tech courses, digital skills, Nigeria, Skiva Digital Academy, digital marketing" />
       </Helmet>
 
-      {/* Course Details Modal */}
+      {/* Course Details Modal - Only show for non-custom courses */}
       <AnimatePresence>
-        {showCourseModal && selectedCourse && (
+        {showCourseModal && selectedCourse && !isCustomCourse && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -883,11 +930,11 @@ Please contact me with available dates and payment details.`;
                       {allCourses.map(course => (
                         <option key={course} value={course}>{course}</option>
                       ))}
-                      <option value="Other">Other (Please specify below)</option>
+                      <option value="Other">Other (Custom Course)</option>
                     </select>
                     
-                    {/* View Course Details Link - With Eye icon */}
-                    {formData.courseInterest && formData.courseInterest !== 'Other' && (
+                    {/* View Course Details Link - Only show for non-custom courses */}
+                    {formData.courseInterest && !isCustomCourse && (
                       <div className="mt-2 text-right">
                         <button
                           type="button"
@@ -911,27 +958,26 @@ Please contact me with available dates and payment details.`;
                     >
                       <label htmlFor="otherCourseName" className="flex items-center space-x-2 text-gray-700 font-medium">
                         <HelpCircle className="h-4 w-4 text-primary" />
-                        <span>Other Course Name (if not listed)</span>
+                        <span>Describe Your Custom Course Request *</span>
                       </label>
-                      <Input
+                      <Textarea
                         id="otherCourseName"
                         name="otherCourseName"
-                        type="text"
                         value={formData.otherCourseName}
                         onChange={handleOtherCourseChange}
-                        placeholder="Enter the name of the course you're interested in"
-                        maxLength={150}
-                        className="w-full"
+                        placeholder="Please describe the course you're looking for. Include topics, duration, and any specific requirements."
+                        maxLength={300}
+                        className="w-full min-h-[120px]"
                       />
                       <div className="flex justify-between items-center text-sm text-gray-500">
-                        <span>Please describe the course you're looking for</span>
-                        <span>{formData.otherCourseName.length}/150</span>
+                        <span>We'll contact you with a custom quote based on your requirements</span>
+                        <span>{formData.otherCourseName.length}/300</span>
                       </div>
                     </motion.div>
                   )}
                 </div>
 
-                {/* Training Mode - Removed Physical One-on-one */}
+                {/* Training Mode - Show different options for custom vs standard courses */}
                 <div className="space-y-4">
                   <label className="flex items-center space-x-2 text-gray-700 font-medium">
                     <Users className="h-5 w-5 text-primary" />
@@ -940,8 +986,8 @@ Please contact me with available dates and payment details.`;
                   <div className="space-y-2">
                     {['Online (Group)', 'Online (One-on-one)'].map(mode => {
                       const modeOriginalPrice = getPriceForMode(formData.courseInterest, mode);
-                      const modeDiscount = isPromoApplied ? modeOriginalPrice * 0.3 : 0;
-                      const modeFinalPrice = modeOriginalPrice - modeDiscount;
+                      const modeDiscount = isPromoApplied && modeOriginalPrice !== null ? modeOriginalPrice * 0.3 : 0;
+                      const modeFinalPrice = modeOriginalPrice !== null ? modeOriginalPrice - modeDiscount : null;
                       
                       return (
                         <label key={mode} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer has-[:checked]:bg-secondary has-[:checked]:border-primary">
@@ -957,7 +1003,7 @@ Please contact me with available dates and payment details.`;
                             <span className="text-gray-700 font-medium">{mode}</span>
                           </div>
                           <div className="text-right">
-                            {formData.courseInterest && (
+                            {formData.courseInterest && !isCustomCourse && (
                               <>
                                 {isPromoApplied ? (
                                   <>
@@ -968,6 +1014,9 @@ Please contact me with available dates and payment details.`;
                                   <span className="text-primary font-semibold">₦{modeOriginalPrice.toLocaleString()}</span>
                                 )}
                               </>
+                            )}
+                            {isCustomCourse && (
+                              <span className="text-gray-500 text-sm italic">Custom Quote</span>
                             )}
                           </div>
                         </label>
@@ -1034,64 +1083,91 @@ Please contact me with available dates and payment details.`;
                   />
                 </div>
                 
-                {/* Promo Code Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Tag className="h-5 w-5 text-primary" />
-                    <label htmlFor="promoCode" className="text-gray-700 font-medium">Promo Code (Optional)</label>
-                  </div>
-                  <div className={`p-4 rounded-lg border-2 ${isPromoApplied ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex-1">
-                        <Input
-                          id="promoCode"
-                          name="promoCode"
-                          type="text"
-                          value={formData.promoCode}
-                          onChange={handlePromoCodeChange}
-                          placeholder="Enter promo code"
-                          className={`h-12 text-center font-medium ${isPromoApplied ? 'border-green-300 bg-white' : 'border-yellow-300'}`}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        onClick={handlePromoCodeApply}
-                        disabled={!formData.promoCode.trim() || isPromoApplied}
-                        className={`h-12 ${isPromoApplied ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white font-semibold`}
-                      >
-                        {isPromoApplied ? '✓ Applied' : 'Apply Code'}
-                      </Button>
+                {/* Promo Code Section - Hide for custom courses */}
+                {!isCustomCourse && (
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Tag className="h-5 w-5 text-primary" />
+                      <label htmlFor="promoCode" className="text-gray-700 font-medium">Promo Code (Optional)</label>
                     </div>
-                    {isPromoApplied && (
-                      <div className="mt-3 p-3 bg-green-100 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <span className="text-green-800 font-semibold">🎉 30% Discount Applied!</span>
-                          <span className="text-green-800 font-bold">
-                            You save: ₦{discount.toLocaleString()}
-                          </span>
+                    <div className={`p-4 rounded-lg border-2 ${isPromoApplied ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex-1">
+                          <Input
+                            id="promoCode"
+                            name="promoCode"
+                            type="text"
+                            value={formData.promoCode}
+                            onChange={handlePromoCodeChange}
+                            placeholder="Enter promo code"
+                            className={`h-12 text-center font-medium ${isPromoApplied ? 'border-green-300 bg-white' : 'border-yellow-300'}`}
+                          />
                         </div>
-                        <p className="text-green-700 text-sm mt-1">
-                          Your training fee has been reduced from ₦{originalPrice.toLocaleString()} to ₦{calculatedPrice.toLocaleString()}
+                        <Button
+                          type="button"
+                          onClick={handlePromoCodeApply}
+                          disabled={!formData.promoCode.trim() || isPromoApplied}
+                          className={`h-12 ${isPromoApplied ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'} text-white font-semibold`}
+                        >
+                          {isPromoApplied ? '✓ Applied' : 'Apply Code'}
+                        </Button>
+                      </div>
+                      {isPromoApplied && (
+                        <div className="mt-3 p-3 bg-green-100 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <span className="text-green-800 font-semibold">🎉 30% Discount Applied!</span>
+                            <span className="text-green-800 font-bold">
+                              You save: ₦{discount.toLocaleString()}
+                            </span>
+                          </div>
+                          <p className="text-green-700 text-sm mt-1">
+                            Your training fee has been reduced from ₦{originalPrice.toLocaleString()} to ₦{calculatedPrice.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {!isPromoApplied && formData.promoCode && (
+                        <p className="text-sm text-gray-600 mt-2 text-center">
+                          Enter your discount code to receive 30% off your training fee!
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Info message for custom courses */}
+                {isCustomCourse && (
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-start space-x-3">
+                      <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-blue-800 font-medium">Custom Course Request</p>
+                        <p className="text-blue-700 text-sm mt-1">
+                          For custom courses, we'll provide a personalized quote based on your specific requirements. 
+                          Our team will contact you within 24 hours with pricing details and course customization options.
                         </p>
                       </div>
-                    )}
-                    {!isPromoApplied && formData.promoCode && (
-                      <p className="text-sm text-gray-600 mt-2 text-center">
-                        Enter your discount code to receive 30% off your training fee!
-                      </p>
-                    )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="text-center">
                   <Button 
                     type="submit" 
                     size="lg" 
                     disabled={isSubmitting} 
-                    className="w-full md:w-auto bg-accent text-accent-foreground hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full md:w-auto ${isCustomCourse ? 'bg-blue-600 hover:bg-blue-700' : 'bg-accent text-accent-foreground hover:bg-yellow-400'} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    {isSubmitting ? 'Submitting...' : `Book Training - ₦${calculatedPrice.toLocaleString()}`}
+                    {isSubmitting ? 'Submitting...' : (
+                      isCustomCourse 
+                        ? 'Request Custom Quote' 
+                        : `Book Training - ₦${calculatedPrice.toLocaleString()}`
+                    )}
                   </Button>
+                  {isCustomCourse && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      No price shown - We'll provide a custom quote based on your requirements
+                    </p>
+                  )}
                 </div>
               </form>
             </motion.div>

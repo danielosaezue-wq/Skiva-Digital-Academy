@@ -2,7 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, Linkedin, Instagram } from 'lucide-react';
 import PolicyModal from '@/components/PolicyModal';
-import { faqContent, privacyPolicyContent, termsOfServiceContent } from '@/lib/legalContent';
+import {
+  faqContent,
+  privacyPolicyContent,
+  termsOfServiceContent,
+} from '@/lib/legalContent';
 
 const TikTokIcon = (props) => (
   <svg
@@ -21,30 +25,53 @@ const TikTokIcon = (props) => (
 );
 
 const Footer = () => {
-  const logoUrl = "https://horizons-cdn.hostinger.com/3ecd7a20-b3eb-4907-8c44-334fb3f217e8/71943397a9d660482eaee272e28e3f9f.png";
+  // ✅ FIXED: local light logo for dark footer
+  const logoUrl = '/skiva-logo-light.png';
 
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           <div className="md:col-span-4 space-y-4">
-            <div className="flex items-center space-x-2">
-              <img src={logoUrl} alt="Skiva Digital Academy Logo" className="h-10 w-auto" />
-              <span className="text-xl font-bold text-white font-heading">Skiva Digital Academy</span>
+            <div className="flex items-center space-x-3">
+              <img
+                src={logoUrl}
+                alt="Skiva Digital Academy Logo"
+                className="h-10 w-auto"
+                loading="lazy"
+              />
+              <span className="text-xl font-bold text-white font-heading">
+                Skiva Digital Academy
+              </span>
             </div>
+
             <p className="text-gray-200 text-sm">
-              Equipping individuals with practical, market-ready skills to thrive in the global digital economy.
+              Equipping individuals with practical, market-ready skills to thrive
+              in the global digital economy.
             </p>
+
             <div className="pt-4">
-              <p className="text-lg font-semibold text-white mb-3 block font-heading">Contact</p>
+              <p className="text-lg font-semibold text-white mb-3 font-heading">
+                Contact
+              </p>
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-accent" />
-                  <a href="mailto:info@skivadigitalacademy.com" className="text-gray-200 text-sm hover:text-accent">info@skivadigitalacademy.com</a>
+                  <a
+                    href="mailto:info@skivadigitalacademy.com"
+                    className="text-gray-200 text-sm hover:text-accent"
+                  >
+                    info@skivadigitalacademy.com
+                  </a>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4 text-accent" />
-                  <a href="tel:+2347025753414" className="text-gray-200 text-sm hover:text-accent">+234 702 575 3414</a>
+                  <a
+                    href="tel:+2347025753414"
+                    className="text-gray-200 text-sm hover:text-accent"
+                  >
+                    +234 702 575 3414
+                  </a>
                 </div>
               </div>
             </div>
@@ -52,28 +79,65 @@ const Footer = () => {
 
           <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-12">
             <div>
-              <p className="text-lg font-semibold text-white mb-4 block font-heading">Company</p>
+              <p className="text-lg font-semibold text-white mb-4 font-heading">
+                Company
+              </p>
               <div className="space-y-3">
-                <Link to="/about" className="block text-gray-200 hover:text-accent transition-colors">About Us</Link>
-                <Link to="/blog" className="block text-gray-200 hover:text-accent transition-colors">Blog</Link>
-                <PolicyModal triggerText="FAQ" title="Frequently Asked Questions" content={faqContent} />
-                <Link to="/contact" className="block text-gray-200 hover:text-accent transition-colors">Contact Us</Link>
+                <Link to="/about" className="block text-gray-200 hover:text-accent">
+                  About Us
+                </Link>
+                <Link to="/blog" className="block text-gray-200 hover:text-accent">
+                  Blog
+                </Link>
+                <PolicyModal
+                  triggerText="FAQ"
+                  title="Frequently Asked Questions"
+                  content={faqContent}
+                />
+                <Link to="/contact" className="block text-gray-200 hover:text-accent">
+                  Contact Us
+                </Link>
               </div>
             </div>
+
             <div>
-              <p className="text-lg font-semibold text-white mb-4 block font-heading">Programs</p>
+              <p className="text-lg font-semibold text-white mb-4 font-heading">
+                Programs
+              </p>
               <div className="space-y-3">
-                <Link to="/courses" className="block text-gray-200 hover:text-accent transition-colors">All Courses</Link>
-                <Link to="/mentorship" className="block text-gray-200 hover:text-accent transition-colors">Mentorship</Link>
-                <Link to="/book-training" className="block text-gray-200 hover:text-accent transition-colors">Book a Training</Link>
-                <Link to="/become-an-instructor" className="block text-gray-200 hover:text-accent transition-colors">Become an Instructor</Link>
+                <Link to="/courses" className="block text-gray-200 hover:text-accent">
+                  All Courses
+                </Link>
+                <Link to="/mentorship" className="block text-gray-200 hover:text-accent">
+                  Mentorship
+                </Link>
+                <Link to="/book-training" className="block text-gray-200 hover:text-accent">
+                  Book a Training
+                </Link>
+                <Link
+                  to="/become-an-instructor"
+                  className="block text-gray-200 hover:text-accent"
+                >
+                  Become an Instructor
+                </Link>
               </div>
             </div>
+
             <div>
-              <p className="text-lg font-semibold text-white mb-4 block font-heading">Legal</p>
+              <p className="text-lg font-semibold text-white mb-4 font-heading">
+                Legal
+              </p>
               <div className="space-y-3">
-                <PolicyModal triggerText="Terms of Service" title="Terms of Service" content={termsOfServiceContent} />
-                <PolicyModal triggerText="Privacy Policy" title="Privacy Policy" content={privacyPolicyContent} />
+                <PolicyModal
+                  triggerText="Terms of Service"
+                  title="Terms of Service"
+                  content={termsOfServiceContent}
+                />
+                <PolicyModal
+                  triggerText="Privacy Policy"
+                  title="Privacy Policy"
+                  content={privacyPolicyContent}
+                />
               </div>
             </div>
           </div>
@@ -84,9 +148,15 @@ const Footer = () => {
             © {new Date().getFullYear()} Skiva Digital Academy. All rights reserved.
           </p>
           <div className="flex items-center space-x-4">
-            <a href="#" className="text-gray-300 hover:text-accent transition-colors"><Linkedin className="h-5 w-5" /></a>
-            <a href="#" className="text-gray-300 hover:text-accent transition-colors"><Instagram className="h-5 w-5" /></a>
-            <a href="#" className="text-gray-300 hover:text-accent transition-colors"><TikTokIcon className="h-5 w-5" /></a>
+            <a href="#" className="text-gray-300 hover:text-accent">
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a href="#" className="text-gray-300 hover:text-accent">
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a href="#" className="text-gray-300 hover:text-accent">
+              <TikTokIcon className="h-5 w-5" />
+            </a>
           </div>
         </div>
       </div>
